@@ -235,34 +235,38 @@ bool loadELF(testbench<Vriscv_soc> *cpu, const char *program_path, const bool en
 int main(int argc, char** argv, char** env){
     Verilated::commandArgs(argc, argv);
 
-    // auto *rbb = new jtag_rbb(8080);
+    auto *rbb = new jtag_rbb(8080);
     auto *soc = new testbench<Vriscv_soc>;
     int test = 50;
     unsigned char srst_pin;
     unsigned char trst_pin;
 
-    // rbb->tck_pin   = &soc->core->sim_jtag_tck;
-    // rbb->tms_pin   = &soc->core->sim_jtag_tms;
-    // rbb->tdi_pin   = &soc->core->sim_jtag_tdi;
-    // rbb->tdo_pin   = &soc->core->sim_jtag_tdo;
-    // rbb->trst_pin  = &trst_pin; // Must pass a address to the object member
-    // rbb->srst_pin  = &srst_pin; // Must pass a address to the object member
-    // rbb->trstn_pin = &soc->core->sim_jtag_trstn;
+    // soc->opentrace(STRINGIZE_VALUE_OF(WAVEFORM_VCD));
+
+    rbb->tck_pin   = &soc->core->sim_jtag_tck;
+    rbb->tms_pin   = &soc->core->sim_jtag_tms;
+    rbb->tdi_pin   = &soc->core->sim_jtag_tdi;
+    rbb->tdo_pin   = &soc->core->sim_jtag_tdo;
+    rbb->trst_pin  = &trst_pin; // Must pass a address to the object member
+    rbb->srst_pin  = &srst_pin; // Must pass a address to the object member
+    rbb->trstn_pin = &soc->core->sim_jtag_trstn;
 
     cout << "\n[RISCV SoC] Emulator started";
     cout << "\n[VCD File] " << STRINGIZE_VALUE_OF(WAVEFORM_VCD);
     cout << "\n[IRAM KB Size] " << STRINGIZE_VALUE_OF(IRAM_KB_SIZE) << "KB";
     cout << "\n[DRAM KB Size] " << STRINGIZE_VALUE_OF(DRAM_KB_SIZE) << "KB \n";
 
+    soc->core->fetch_enable_i = 1;
+
     if (!loadELF(soc, argv[1], true))
         exit(1);
 
-    // soc->opentrace(STRINGIZE_VALUE_OF(WAVEFORM_VCD));
-    soc->core->fetch_enable_i = 1;
+    soc->core->boot_addr_i = 0x1A000080;
+
     soc->reset_n(2);
 
     while(true) {
-        // rbb->read_cmd(false);
+        rbb->read_cmd(false);
 		soc->tick();
 	}
     soc->close();

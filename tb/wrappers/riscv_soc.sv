@@ -3,6 +3,9 @@
 `include "config_soc.v"
 `ifdef USE_RI5CY
   `include "config_ri5cy.v"
+  `ifdef USE_RI5CY_JTAG
+    import dm::*;
+  `endif
 `endif
 
 module riscv_soc (
@@ -19,7 +22,8 @@ module riscv_soc (
   logic gpio_out;
 
   logic cpu_boot_addr;
-  logic debug_ri5cy_act = 0;
+
+  logic [`N_OF_HARTS-1:0]      dm_debug_req;
 
   /**********************
     AHB WIREUP SIGNALS
@@ -57,8 +61,9 @@ module riscv_soc (
   assign HCLK = clk;
   assign HRESETn = reset_n;
 
-  assign mst_priority[0] = 0;
-  assign mst_priority[1] = 1;
+  assign mst_priority[0] = 1; // IBus
+  assign mst_priority[1] = 0; // DBus
+  assign mst_priority[2] = 2; // Debug
 
   // AHB Slave addressing
   assign ahb_slv_addr_base[0] = `AHB_SL_BASE_ADDR_0;
@@ -151,12 +156,12 @@ module riscv_soc (
     // Control signals
     .clk_en_i('1),
     .boot_addr_i(boot_addr_i),
-    .core_id_i('0),
-    .cluster_id_i('0),
+    .core_id_i(`CORE_ID),
+    .cluster_id_i(`CLUSTER_ID),
     .fetch_enable_i(fetch_enable_i),
     .core_busy_o(),
     .ext_perf_counters_i('0),
-    .debug_req_i('0),
+    .debug_req_i(dm_debug_req[`CORE_MHARTID]),
     .sec_lvl_o(),
     // IRQ Signals
     .irq_i('0),
@@ -206,6 +211,155 @@ module riscv_soc (
   );
 
   `ifdef USE_RI5CY_JTAG
+    localparam logic [`N_OF_HARTS-1:0] SELECTABLE_HARTS = 1 << `CORE_MHARTID;
+
+    // jtag openocd bridge signals
+    logic                        sim_jtag_tck;
+    logic                        sim_jtag_tms;
+    logic                        sim_jtag_tdi;
+    logic                        sim_jtag_trstn;
+    logic                        sim_jtag_tdo;
+
+    // signals for debug unit
+    logic                        debug_req_ready;
+    dm::dmi_resp_t               debug_resp;
+    logic                        jtag_req_valid;
+    dm::dmi_req_t                jtag_dmi_req;
+    logic                        jtag_resp_ready;
+    logic                        jtag_resp_valid;
+    logic                        ndmreset, ndmreset_n;
+
+    // debug unit slave interface
+    logic                        dm_grant;
+    logic                        dm_rvalid;
+    logic                        dm_req;
+    logic                        dm_we;
+    logic [31:0]                 dm_addr;
+    logic [31:0]                 dm_wdata;
+    logic [31:0]                 dm_rdata;
+    logic [3:0]                  dm_be;
+
+    // debug unit master interface (system bus access)
+    logic                        sb_req;
+    logic [31:0]                 sb_addr;
+    logic                        sb_we;
+    logic [31:0]                 sb_wdata;
+    logic [3:0]                  sb_be;
+    logic                        sb_gnt;
+    logic                        sb_rvalid;
+    logic [31:0]                 sb_rdata;
+
+    // debug subsystem
+    dmi_jtag #(
+      .IdcodeValue          ( `JTAG_DECODE_ID )
+    ) i_dmi_jtag (
+      .clk_i                ( clk             ),
+      .rst_ni               ( reset_n         ),
+      .testmode_i           ( 1'b0            ),
+      .dmi_req_o            ( jtag_dmi_req    ),
+      .dmi_req_valid_o      ( jtag_req_valid  ),
+      .dmi_req_ready_i      ( debug_req_ready ),
+      .dmi_resp_i           ( debug_resp      ),
+      .dmi_resp_ready_o     ( jtag_resp_ready ),
+      .dmi_resp_valid_i     ( jtag_resp_valid ),
+      .dmi_rst_no           (                 ), // not connected
+      .tck_i                ( sim_jtag_tck    ),
+      .tms_i                ( sim_jtag_tms    ),
+      .trst_ni              ( sim_jtag_trstn  ),
+      .td_i                 ( sim_jtag_tdi    ),
+      .td_o                 ( sim_jtag_tdo    ),
+      .tdo_oe_o             (                 )
+    );
+
+    dm_top #(
+      .NrHarts           ( `N_OF_HARTS       ),
+      .BusWidth          ( 32                ),
+      .SelectableHarts   ( `SELECTABLE_HARTS )
+    ) i_dm_top (
+      .clk_i             ( clk               ),
+      .rst_ni            ( reset_n           ),
+      .testmode_i        ( 1'b0              ),
+      .ndmreset_o        ( ndmreset          ),
+      .dmactive_o        (                   ), // active debug session TODO
+      .debug_req_o       ( dm_debug_req      ),
+      .unavailable_i     ( ~(`SELECTABLE_HARTS)),
+      .hartinfo_i        ( '0                ),
+
+      .slave_req_i       ( dm_req            ),
+      .slave_we_i        ( dm_we             ),
+      .slave_addr_i      ( dm_addr           ),
+      .slave_be_i        ( dm_be             ),
+      .slave_wdata_i     ( dm_wdata          ),
+      .slave_rdata_o     ( dm_rdata          ),
+
+      .master_req_o      ( sb_req            ),
+      .master_add_o      ( sb_addr           ),
+      .master_we_o       ( sb_we             ),
+      .master_wdata_o    ( sb_wdata          ),
+      .master_be_o       ( sb_be             ),
+      .master_gnt_i      ( sb_gnt            ),
+      .master_r_valid_i  ( sb_rvalid         ),
+      .master_r_rdata_i  ( sb_rdata          ),
+
+      .dmi_rst_ni        ( reset_n           ),
+      .dmi_req_valid_i   ( jtag_req_valid    ),
+      .dmi_req_ready_o   ( debug_req_ready   ),
+      .dmi_req_i         ( jtag_dmi_req      ),
+      .dmi_resp_valid_o  ( jtag_resp_valid   ),
+      .dmi_resp_ready_i  ( jtag_resp_ready   ),
+      .dmi_resp_o        ( debug_resp        )
+    );
+
+    // grant in the same cycle
+    assign dm_gnt = dm_req;
+    // valid read/write in the next cycle
+    always_ff @(posedge clk or negedge reset_n) begin : dm_valid_handler
+      if(~reset_n) begin
+        dm_rvalid <= '0;
+      end else begin
+        dm_rvalid <= dm_gnt;
+      end
+    end
+
+    // reset handling with ndmreset
+    rstgen i_rstgen_main (
+      .clk_i        ( clk                   ),
+      .rst_ni       ( reset_n & (~ndmreset) ),
+      .test_mode_i  ( '0                    ),
+      .rst_no       ( ndmreset_n            ),
+      .init_no      (                       ) // keep open
+    );
+
+    ri5cy_to_ahb # (
+      .AHB_ADDR_WIDTH(`AHB_HADDR_SIZE),
+      .AHB_DATA_WIDTH(`AHB_HDATA_SIZE)
+    ) debug_unit_ahb_master (
+      .clk(clk),
+      .rstn(reset_n),
+      // Custom RI5CY memory interface
+      .req_i(sb_req),
+      .we_i(sb_we),
+      .be_i(sb_be),
+      .addr_i(sb_addr),
+      .wdata_i(sb_wdata),
+      .gnt_o(sb_gnt),
+      .rvalid_o(sb_rvalid),
+      .rdata_o(sb_rdata),
+      // AHB master signals
+      .hsel_o(ahb_master[2].HSEL),
+      .haddr_o(ahb_master[2].HADDR),
+      .hwdata_o(ahb_master[2].HWDATA),
+      .hwrite_o(ahb_master[2].HWRITE),
+      .hsize_o(ahb_master[2].HSIZE),
+      .hburst_o(ahb_master[2].HBURST),
+      .hprot_o(ahb_master[2].HPROT),
+      .htrans_o(ahb_master[2].HTRANS),
+      .hmastlock_o(ahb_master[2].HMASTLOCK),
+      .hready_o(ahb_master[2].HREADY),
+      .hrdata_i(ahb_master[2].HRDATA),
+      .hreadyout_i(ahb_master[2].HREADYOUT),
+      .hresp_i(ahb_master[2].HRESP)
+    );
   `endif
 `else
   // riscorvo_ahb_top # (

@@ -30,7 +30,13 @@ SOC_IPS				:=	ahb3lite_pkg							\
 									utils
 
 # RI5CY RTLs files
-COMMON_CELLS	:=	ips/common_cells/include/common_cells/registers.svh
+COMMON_CELLS	:=	ips/common_cells/include/common_cells/registers.svh	\
+									ips/common_cells/src/cdc_2phase.sv									\
+									ips/common_cells/src/deprecated/fifo_v2.sv					\
+									ips/common_cells/src/fifo_v3.sv											\
+									ips/common_cells/src/rstgen.sv											\
+									ips/common_cells/src/rstgen_bypass.sv
+
 
 SRC_FPNEW			:=	ips/fpnew/src/fpnew_pkg.sv 																		\
 									ips/fpnew/src/fpu_div_sqrt_mvp/hdl/defs_div_sqrt_mvp.sv 			\
@@ -84,6 +90,16 @@ SRC_RI5CY			:=	ips/riscv/tb/core/cluster_clock_gating.sv			\
 									ips/riscv/rtl/riscv_L0_buffer.sv              \
 									ips/riscv/rtl/riscv_pmp.sv
 
+SRC_RI5CY_DBG	:= 	ips/riscv-dbg/src/dm_pkg.sv										\
+									ips/riscv-dbg/src/dmi_jtag.sv									\
+									ips/riscv-dbg/src/dm_csrs.sv									\
+									ips/riscv-dbg/src/dmi_jtag_tap.sv							\
+									ips/riscv-dbg/src/dmi_cdc.sv									\
+									ips/riscv-dbg/src/dm_top.sv										\
+									ips/riscv-dbg/src/dm_sba.sv										\
+									ips/riscv-dbg/src/dm_mem.sv										\
+									ips/riscv-dbg/debug_rom/debug_rom.sv
+
 # All the folders that must be include to compile verilog
 INC_VERILOG		:=	$(VERILATOR_TB)/inc									\
 									$(IPS_FOLDER)/riscv/rtl/include			\
@@ -92,6 +108,7 @@ INC_VERILOG		:=	$(VERILATOR_TB)/inc									\
 # All sources needed to build the verilator model
 SRC_VERILOG 	:=	$(foreach IP,$(SOC_IPS),$(shell find $(IPS_FOLDER)/$(IP) -name *.v))
 SRC_VERILOG 	+=	$(foreach IP,$(SOC_IPS),$(shell find $(IPS_FOLDER)/$(IP) -name *.sv))
+SRC_VERILOG		+=	$(SRC_RI5CY_DBG)
 SRC_VERILOG		+=	$(wildcard $(VERILATOR_TB)/wrappers/*.sv)
 SRC_VERILOG		+=	$(wildcard $(VERILATOR_TB)/wrappers/*.v)
 SRC_VERILOG		+=	$(COMMON_CELLS)
@@ -122,6 +139,7 @@ VERIL_FLAGS		:=	-O3 										\
 									-Wno-CASEWITHX					\
 									-Wno-CASEX							\
 									-Wno-BLKANDNBLK					\
+									-Wno-CMPCONST						\
 									--exe										\
 									--threads	4							\
 									--trace 								\
@@ -171,8 +189,10 @@ run: sw $(VERILATOR_EXE)
 	$(VERILATOR_EXE) sw/$(TEST_PROG)/output/$(TEST_PROG).elf
 
 verilator: $(VERILATOR_EXE)
+	@echo "\n"
 	@echo "Emulator build, for usage please follow:"
 	@echo "\033[96m\e[1m./$(VERILATOR_EXE) -h\033[0m"
+	@echo "\n"
 
 $(VERILATOR_EXE): $(OUT_VERILATOR)/V$(ROOT_MOD_VERI).mk
 	+@make -C $(OUT_VERILATOR) -f V$(ROOT_MOD_VERI).mk

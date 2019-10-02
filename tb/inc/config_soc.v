@@ -3,7 +3,7 @@
   `define SYSTEM_RESET_VECTOR 32'h00AA_0000
   `define SYSTEM_TRAP_VECTOR  32'h00AA_0000
 
-  `define AHB_MASTERS_NUM     2  // Number of masters AHB
+  `define AHB_MASTERS_NUM     3  // Number of masters AHB
   `define AHB_SLAVES_NUM      4  // Number of slaves AHB
   `define AHB_HADDR_SIZE      32 // bit-width AHB address haddr
   `define AHB_HDATA_SIZE      32 // bit-width AHB data

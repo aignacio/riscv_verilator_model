@@ -19,4 +19,11 @@
   `define APU_NDSFLAGS_CPU    15
   `define APU_NUSFLAGS_CPU    5
   `define DM_HaltAddress      32'h1A110800
+  `define CORE_ID             4'd0
+  `define CLUSTER_ID          6'd0
+  `define CORE_MHARTID        {`CLUSTER_ID, 1'b0, `CORE_ID}
+  // Debug Parameters
+  `define SELECTABLE_HARTS    1
+  `define N_OF_HARTS          1
+  `define JTAG_DECODE_ID      32'h249511C3
 `endif
