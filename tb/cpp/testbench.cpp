@@ -143,7 +143,7 @@ template<class module> class testbench {
 //     return bytes;
 // }
 
-bool loadELF(testbench<Vriscv_soc> *cpu, const char *program_path, const bool en_print) {
+bool loadELF(testbench<Vriscv_soc> *cpu, const char *program_path, const bool en_print){
     ELFIO::elfio program;
 
     program.load(program_path);
@@ -185,6 +185,16 @@ bool loadELF(testbench<Vriscv_soc> *cpu, const char *program_path, const bool en
         // bytes are defined to hold the value 0 and to follow the segment’s initialized area. The file
         // size may not be larger than the memory size. Loadable segment entries in the program
         // header table appear in ascending order, sorted on the p_vaddr member.
+        if (mem_size >= (IRAM_KB_SIZE*1024)){
+            printf("\n\n[ELF Loader] ERROR:");
+            printf("\nELF program: %d bytes", mem_size);
+            printf("\nVerilator model memory size: %d bytes", (IRAM_KB_SIZE*1024));
+            if (lma_addr >= 0xA0000000 && lma_addr < 0xB0000000)
+                printf("\nIncrease your verilator model IRAM by %d kb\n", (mem_size - (IRAM_KB_SIZE*1024))/1024);
+            else
+                printf("\nIncrease your verilator model DRAM by %d kb\n", ((mem_size - (IRAM_KB_SIZE*1024))/1024)+1);
+            return false;
+        }
 
         if (lma_addr >= 0xA0000000 && lma_addr < 0xB0000000){
             // IRAM Address
@@ -222,7 +232,7 @@ bool loadELF(testbench<Vriscv_soc> *cpu, const char *program_path, const bool en
     return true;
 }
 
-int main(int argc, char** argv, char** env) {
+int main(int argc, char** argv, char** env){
     Verilated::commandArgs(argc, argv);
 
     // auto *rbb = new jtag_rbb(8080);
@@ -261,6 +271,6 @@ int main(int argc, char** argv, char** env) {
 
 static vluint64_t  cpuTime = 0;
 
-double sc_time_stamp () {
+double sc_time_stamp (){
     return cpuTime;
 }
