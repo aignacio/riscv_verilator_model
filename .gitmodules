@@ -1,0 +1,33 @@
+[submodule "ips/ahb3lite_memory"]
+	path = ips/ahb3lite_memory
+	url = git@github.com:aignacio/ahb3lite_memory.git
+[submodule "ips/ahb3lite_interconnect"]
+	path = ips/ahb3lite_interconnect
+	url = git@github.com:RoaLogic/ahb3lite_interconnect.git
+[submodule "ips/ahb3lite_apb_bridge"]
+	path = ips/ahb3lite_apb_bridge
+	url = git@github.com:aignacio/ahb3lite_apb_bridge.git
+[submodule "ips/ahb3lite_pkg"]
+	path = ips/ahb3lite_pkg
+	url = git@github.com:RoaLogic/ahb3lite_pkg.git
+[submodule "ips/apb4_mux"]
+	path = ips/apb4_mux
+	url = git@github.com:RoaLogic/apb4_mux.git
+[submodule "ips/apb_gpio"]
+	path = ips/apb_gpio
+	url = git@github.com:pulp-platform/apb_gpio.git
+[submodule "ips/riscv"]
+	path = ips/riscv
+	url = git@github.com:pulp-platform/riscv.git
+[submodule "ips/memory"]
+	path = ips/memory
+	url = git@github.com:RoaLogic/memory.git
+[submodule "ips/fpnew"]
+	path = ips/fpnew
+	url = git@github.com:pulp-platform/fpnew.git
+[submodule "ips/common_cells"]
+	path = ips/common_cells
+	url = git@github.com:pulp-platform/common_cells.git
+[submodule "tb/cpp/elfio"]
+	path = tb/cpp/elfio
+	url = git@github.com:serge1/ELFIO.git
