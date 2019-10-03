@@ -3,29 +3,35 @@
   `define SYSTEM_RESET_VECTOR 32'h00AA_0000
   `define SYSTEM_TRAP_VECTOR  32'h00AA_0000
 
+  // To define the AHB mask  -->  mask = ~(FINAL ADDRESS - BASE ADDRESS)
+
   `define AHB_MASTERS_NUM     3  // Number of masters AHB
-  `define AHB_SLAVES_NUM      4  // Number of slaves AHB
+  `define AHB_SLAVES_NUM      6  // Number of slaves AHB
   `define AHB_HADDR_SIZE      32 // bit-width AHB address haddr
   `define AHB_HDATA_SIZE      32 // bit-width AHB data
   `define AHB_SL_BASE_ADDR_0  32'hA000_0000
   `define AHB_SL_MASK_ADDR_0  32'hF000_0000 // To define the mask  -->  mask = ~(FINAL ADDRESS - BASE ADDRESS)
   `define AHB_SL_BASE_ADDR_1  32'hB000_0000
   `define AHB_SL_MASK_ADDR_1  32'hF000_0000 // To define the mask  -->  mask = ~(FINAL ADDRESS - BASE ADDRESS)
-  `define AHB_SL_BASE_ADDR_2  32'h1000_0000
+  `define AHB_SL_BASE_ADDR_2  32'h5000_0000
   `define AHB_SL_MASK_ADDR_2  32'hF000_0000 // To define the mask  -->  mask = ~(FINAL ADDRESS - BASE ADDRESS)
   `define AHB_SL_BASE_ADDR_3  32'h2000_0000
   `define AHB_SL_MASK_ADDR_3  32'hFFFF_0000 // To define the mask  -->  mask = ~(FINAL ADDRESS - BASE ADDRESS)
+  `define AHB_SL_BASE_ADDR_4  32'h1A11_0000 // Debug address space:
+  `define AHB_SL_MASK_ADDR_4  32'hFFFF_0000 // -> 1A11_0000 to 1A11_FFFF
+  `define AHB_SL_BASE_ADDR_5  32'h1A00_0080 // ROM address space:
+  `define AHB_SL_MASK_ADDR_5  32'hFFFF_0000 // -> 1A00_0000 to 1A00_FFFF
 
   `define APB_SLAVES_NUM      2  // Number of slaves APB
   `define APB_PADDR_SIZE      32 // bit-width APB address
   `define APB_PDATA_SIZE      32 // bit-width APB data
-  `define APB_SL_BASE_ADDR_0  32'h100A_0000
+  `define APB_SL_BASE_ADDR_0  32'h500A_0000
   `define APB_SL_MASK_ADDR_0  32'hFFFF_0000 // To define the mask  -->  mask = ~(FINAL ADDRESS - BASE ADDRESS)
-  `define APB_SL_BASE_ADDR_1  32'h100B_0000
+  `define APB_SL_BASE_ADDR_1  32'h500B_0000
   `define APB_SL_MASK_ADDR_1  32'hFFFF_0000 // To define the mask  -->  mask = ~(FINAL ADDRESS - BASE ADDRESS)
-  `define APB_SL_BASE_ADDR_2  32'h100C_0000
+  `define APB_SL_BASE_ADDR_2  32'h500C_0000
   `define APB_SL_MASK_ADDR_2  32'hFFFF_0000 // To define the mask  -->  mask = ~(FINAL ADDRESS - BASE ADDRESS)
-  `define APB_SL_BASE_ADDR_3  32'h100D_0000
+  `define APB_SL_BASE_ADDR_3  32'h500D_0000
   `define APB_SL_MASK_ADDR_3  32'hFFFF_0000 // To define the mask  -->  mask = ~(FINAL ADDRESS - BASE ADDRESS)
 
   `define DRAM_SIZE           `DRAM_KB_SIZE*1024/4

@@ -241,7 +241,7 @@ int main(int argc, char** argv, char** env){
     unsigned char srst_pin;
     unsigned char trst_pin;
 
-    // soc->opentrace(STRINGIZE_VALUE_OF(WAVEFORM_VCD));
+    soc->opentrace(STRINGIZE_VALUE_OF(WAVEFORM_VCD));
 
     rbb->tck_pin   = &soc->core->sim_jtag_tck;
     rbb->tms_pin   = &soc->core->sim_jtag_tms;

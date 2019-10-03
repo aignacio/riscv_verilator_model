@@ -60,7 +60,9 @@ SRC_FPNEW			:=	ips/fpnew/src/fpnew_pkg.sv 																		\
 									ips/fpnew/src/common_cells/src/lzc.sv 												\
 									ips/fpnew/src/common_cells/src/rr_arb_tree.sv
 
-SRC_RI5CY			:=	ips/riscv/tb/core/cluster_clock_gating.sv			\
+SRC_RI5CY			:=	ips/riscv/tb/dm/riscv_tb_pkg.sv								\
+									ips/riscv/tb/dm/boot_rom.sv										\
+									ips/riscv/tb/core/cluster_clock_gating.sv			\
 									ips/riscv/rtl/include/apu_core_package.sv     \
 									ips/riscv/rtl/include/riscv_defines.sv        \
 									ips/riscv/rtl/include/riscv_tracer_defines.sv \

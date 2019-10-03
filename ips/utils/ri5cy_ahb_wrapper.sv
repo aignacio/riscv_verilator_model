@@ -158,60 +158,6 @@ module ri5cy_ahb_wrapper #(
     .hresp_i(data_hresp_i)
   );
 
-  // core2ahb3lite #(
-  //   .AHB_ADDR_WIDTH(AHB_ADDR_WIDTH),
-  //   .AHB_DATA_WIDTH(AHB_DATA_WIDTH)
-  // ) data_ahb (
-  //   .clk_i(core_clk),
-  //   .rst_ni(core_rstn),
-  //   .req_i(data_req),
-  //   .gnt_o(data_gnt),
-  //   .rvalid_o(data_rvalid),
-  //   .addr_i(data_addr),
-  //   .we_i(data_we),
-  //   .be_i(data_be),
-  //   .rdata_o(data_rdata),
-  //   .wdata_i(data_wdata),
-  //   .HADDR_o(data_haddr_o),
-  //   .HWDATA_o(data_hwdata_o),
-  //   .HRDATA_i(data_hrdata_i),
-  //   .HWRITE_o(data_hwrite_o),
-  //   .HSIZE_o(data_hsize_o),
-  //   .HBURST_o(data_hburst_o),
-  //   .HPROT_o(data_hprot_o),
-  //   .HTRANS_o(data_htrans_o),
-  //   .HMASTLOCK_o(data_hmastlock_o),
-  //   .HREADY_i(data_hreadyout_i),
-  //   .HRESP_i(data_hresp_i)
-  // );
-
-  // core2ahb3lite #(
-  //   .AHB_ADDR_WIDTH(AHB_ADDR_WIDTH),
-  //   .AHB_DATA_WIDTH(AHB_DATA_WIDTH)
-  // ) instr_ahb (
-  //   .clk_i(core_clk),
-  //   .rst_ni(core_rstn),
-  //   .req_i(instr_req),
-  //   .gnt_o(instr_gnt),
-  //   .rvalid_o(instr_rvalid),
-  //   .addr_i(instr_addr),
-  //   .we_i('0),
-  //   .be_i('hf),
-  //   .rdata_o(instr_rdata),
-  //   .wdata_i('0),
-  //   .HADDR_o(instr_haddr_o),
-  //   .HWDATA_o(instr_hwdata_o),
-  //   .HRDATA_i(instr_hrdata_i),
-  //   .HWRITE_o(instr_hwrite_o),
-  //   .HSIZE_o(instr_hsize_o),
-  //   .HBURST_o(instr_hburst_o),
-  //   .HPROT_o(instr_hprot_o),
-  //   .HTRANS_o(instr_htrans_o),
-  //   .HMASTLOCK_o(instr_hmastlock_o),
-  //   .HREADY_i(instr_hreadyout_i),
-  //   .HRESP_i(instr_hresp_i)
-  // );
-
   riscv_core #(
     .INSTR_RDATA_WIDTH(INSTR_RDATA_WIDTH),
     .PULP_SECURE(PULP_SECURE),

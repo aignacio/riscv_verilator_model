@@ -61,20 +61,24 @@ module riscv_soc (
   assign HCLK = clk;
   assign HRESETn = reset_n;
 
-  assign mst_priority[0] = 1; // IBus
-  assign mst_priority[1] = 0; // DBus
-  assign mst_priority[2] = 2; // Debug
+  assign mst_priority[0] = 2; // IBus
+  assign mst_priority[1] = 1; // DBus
+  assign mst_priority[2] = 3; // Debug
 
   // AHB Slave addressing
   assign ahb_slv_addr_base[0] = `AHB_SL_BASE_ADDR_0;
   assign ahb_slv_addr_base[1] = `AHB_SL_BASE_ADDR_1;
   assign ahb_slv_addr_base[2] = `AHB_SL_BASE_ADDR_2;
   assign ahb_slv_addr_base[3] = `AHB_SL_BASE_ADDR_3;
+  assign ahb_slv_addr_base[4] = `AHB_SL_BASE_ADDR_4;
+  assign ahb_slv_addr_base[5] = `AHB_SL_BASE_ADDR_5;
 
   assign ahb_slv_addr_mask[0] = `AHB_SL_MASK_ADDR_0;
   assign ahb_slv_addr_mask[1] = `AHB_SL_MASK_ADDR_1;
   assign ahb_slv_addr_mask[2] = `AHB_SL_MASK_ADDR_2;
   assign ahb_slv_addr_mask[3] = `AHB_SL_MASK_ADDR_3;
+  assign ahb_slv_addr_mask[4] = `AHB_SL_MASK_ADDR_4;
+  assign ahb_slv_addr_mask[5] = `AHB_SL_MASK_ADDR_5;
 
   // APB Slave addressing
   assign apb_slv_addr_base[0] = `APB_SL_BASE_ADDR_0;
@@ -152,7 +156,7 @@ module riscv_soc (
   ) riscv_cpu (
     // Core control
     .core_clk(clk),
-    .core_rstn(reset_n),
+    .core_rstn(ndmreset_n),
     // Control signals
     .clk_en_i('1),
     .boot_addr_i(boot_addr_i),
@@ -273,7 +277,7 @@ module riscv_soc (
 
     dm_top #(
       .NrHarts           ( `N_OF_HARTS       ),
-      .BusWidth          ( 32                ),
+      .BusWidth          ( `AHB_HADDR_SIZE   ),
       .SelectableHarts   ( `SELECTABLE_HARTS )
     ) i_dm_top (
       .clk_i             ( clk               ),
@@ -359,6 +363,57 @@ module riscv_soc (
       .hrdata_i(ahb_master[2].HRDATA),
       .hreadyout_i(ahb_master[2].HREADYOUT),
       .hresp_i(ahb_master[2].HRESP)
+    );
+
+    ahb_to_ri5cy # (
+      .AHB_ADDR_WIDTH(`AHB_HADDR_SIZE),
+      .AHB_DATA_WIDTH(`AHB_HDATA_SIZE)
+    ) ahb_slave_debug_unit (
+      .clk(clk),
+      .rstn(reset_n),
+      // Custom RI5CY memory interface
+      .req_o(dm_req),
+      .we_o(dm_we),
+      .be_o(dm_be),
+      .addr_o(dm_addr),
+      .wdata_o(dm_wdata),
+      .rdata_i(dm_rdata),
+      // AHB slave signals
+      .hsel_i(ahb_slave[4].HSEL),
+      .haddr_i(ahb_slave[4].HADDR),
+      .hwdata_i(ahb_slave[4].HWDATA),
+      .hwrite_i(ahb_slave[4].HWRITE),
+      .hsize_i(ahb_slave[4].HSIZE),
+      .hburst_i(ahb_slave[4].HBURST),
+      .hprot_i(ahb_slave[4].HPROT),
+      .htrans_i(ahb_slave[4].HTRANS),
+      .hmastlock_i(ahb_slave[4].HMASTLOCK),
+      .hready_i(ahb_slave[4].HREADY),
+      .hrdata_o(ahb_slave[4].HRDATA),
+      .hreadyout_o(ahb_slave[4].HREADYOUT),
+      .hresp_o(ahb_slave[4].HRESP)
+    );
+
+    ahb_ri5cy_rom # (
+      .AHB_ADDR_WIDTH(`AHB_HADDR_SIZE),
+      .AHB_DATA_WIDTH(`AHB_HDATA_SIZE)
+    ) ahb_riscv_rom (
+      .clk(clk),
+      .rstn(reset_n),
+      // AHB slave signals
+      .hsel_i(ahb_slave[5].HSEL),
+      .haddr_i(ahb_slave[5].HADDR),
+      .hwdata_i(ahb_slave[5].HWDATA),
+      .hwrite_i(ahb_slave[5].HWRITE),
+      .hsize_i(ahb_slave[5].HSIZE),
+      .hburst_i(ahb_slave[5].HBURST),
+      .hprot_i(ahb_slave[5].HPROT),
+      .htrans_i(ahb_slave[5].HTRANS),
+      .hmastlock_i(ahb_slave[5].HMASTLOCK),
+      .hready_i(ahb_slave[5].HREADY),
+      .hrdata_o(ahb_slave[5].HRDATA),
+      .hreadyout_o(ahb_slave[5].HREADYOUT),
+      .hresp_o(ahb_slave[5].HRESP)
     );
   `endif
 `else

@@ -29,7 +29,7 @@ module ri5cy_to_ahb # (
 	input   hreadyout_i,
 	input   hresp_i
 );
-  localparam  IDDLE_HTRANS  = 2'b00,
+  localparam  IDLE_HTRANS   = 2'b00,
               BUSY_HTRANS   = 2'b01,
               NONSEQ_HTRANS = 2'b10,
               SEQ_HTRANS    = 2'b11;
@@ -58,7 +58,7 @@ module ri5cy_to_ahb # (
                               // and must therefore be processed before any other transact
                               // ions are processed. After a locked transfer, it is recomm
                               // ended that the master inserts an IDLE transfer.
-  assign htrans_o = (req_i) ? NONSEQ_HTRANS : IDDLE_HTRANS; // We use just single non-sequential transfer or idle htrans
+  assign htrans_o = (req_i) ? NONSEQ_HTRANS : IDLE_HTRANS; // We use just single non-sequential transfer or idle htrans
                                                             // Indicates that no data transfer is required. A master uses
                                                             // an IDLE transfer when it does not want to perform a data
                                                             // transfer.
