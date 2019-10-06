@@ -1,7 +1,8 @@
 
 module ahb_ri5cy_rom # (
   parameter AHB_ADDR_WIDTH = 32,
-  parameter AHB_DATA_WIDTH = 32
+  parameter AHB_DATA_WIDTH = 32,
+  parameter JTAG_BOOT      = 0
 )(
   input   clk,
   input   rstn,
@@ -37,7 +38,7 @@ module ahb_ri5cy_rom # (
   logic [2:0] fsm_st, next_st;
   logic [31:0] rdata;
 
-  assign hrdata_o     = rdata;
+  assign hrdata_o     = JTAG_BOOT ? 'h6f : rdata;
   assign hreadyout_o  = 1'b1;
   assign hresp_o      = 1'b0;
 
@@ -97,7 +98,7 @@ module ahb_ri5cy_rom # (
   boot_rom rom (
     .clk_i(clk),
     .req_i(req_o),
-    .addr_i(haddr_i[15:0]),
+    .addr_i(haddr_i[15:0]-'h80),
     .rdata_o(rdata)
   );
 

@@ -36,27 +36,67 @@ module ahb_to_ri5cy # (
               HALFWORD  = 3'b001,
               WORD      = 3'b010;
 
-  localparam  IDLE      = 0,
-              WAIT_REQ  = 1,
-              NEW_REQ   = 2;
+  localparam  IDLE       = 0,
+              WAIT_REQ   = 1,
+              NEW_REQ    = 2,
+              WRITE_REQ = 3;
 
   logic [2:0] fsm_st, next_st;
-  logic [3:0] be, be_saved;
+  logic [3:0] be;
+  logic [3:0] be_saved;
+  logic [31:0] haddr_saved;
+  logic [31:0] hrdata_saved;
+  logic rdata_mem, lock;
 
-  assign addr_o       = haddr_i;
-  assign we_o         = hwrite_i;
-  assign wdata_o      = hwdata_i;
-  assign hrdata_o     = rdata_i;
-  assign hreadyout_o  = 1'b1;
+  assign wr_req       = hsel_i && hwrite_i;
+  assign rd_req       = hsel_i && ~hwrite_i;
+  assign hrdata_o     = lock ? hrdata_saved : rdata_i;
+  assign hreadyout_o  = (fsm_st == WRITE_REQ) ? 1'b0 : 1'b1;
   assign hresp_o      = 1'b0;
-  assign be_o         = (req_o && ~hwrite_i) ? be : be_saved;
+
+  always @ (*) begin
+    case(fsm_st)
+      WRITE_REQ: begin
+        addr_o  = haddr_saved;
+        we_o    = 1'b1;
+        wdata_o = hwdata_i;
+        be_o    = be_saved;
+      end
+      default: begin
+        addr_o  = haddr_i;
+        we_o    = hwrite_i;
+        wdata_o = hwdata_i;
+        be_o    = be;
+      end
+    endcase
+  end
 
   always @ (posedge clk) begin
     if (rstn == 1'b0) begin
-      be_saved <= 4'd0;
+      be_saved      <= 4'd0;
+      haddr_saved   <= 32'h0;
+      hrdata_saved  <= 32'h0;
+      rdata_mem     <= 1'b0;
+      lock          <= 1'b0;
     end
     else begin
-      be_saved <= be;
+      if (hsel_i == 1'b1) begin
+        be_saved      <= be;
+        haddr_saved   <= haddr_i;
+      end
+
+      if (rd_req)
+        rdata_mem <= 1'b1;
+      else
+        rdata_mem <= 1'b0;
+
+      if (~hready_i && rdata_mem && ~lock) begin
+        hrdata_saved <= rdata_i;
+        lock <= 1'b1;
+      end
+
+      if (hready_i)
+        lock <= 1'b0;
     end
   end
 
@@ -70,36 +110,43 @@ module ahb_to_ri5cy # (
   end
 
   always @ (posedge clk) begin
-    if (~rstn)
+    if (rstn == 1'b0)
       fsm_st <= IDLE;
     else
-      fsm_st <= next_st;
+      if (hready_i  ==  1'b0      &&
+          fsm_st    !=  IDLE      &&
+          fsm_st    !=  WRITE_REQ &&
+          next_st   !=  WRITE_REQ)
+        fsm_st <= fsm_st;       // Wait....
+      else
+        fsm_st <= next_st;      // In this case, go ahead
   end
 
   always @ (*) begin
     case(fsm_st)
       IDLE:
-        if (~hready_i)
-          next_st = IDLE;
-        else if (hsel_i)
+        if (wr_req)
+          next_st = WRITE_REQ;
+        else if (rd_req)
           next_st = WAIT_REQ;
         else
           next_st = IDLE;
       WAIT_REQ:
-        if (~hready_i)
-          next_st = WAIT_REQ;
-        else if (hsel_i)
+        if (wr_req)
+          next_st = WRITE_REQ;
+        else if (rd_req)
           next_st = NEW_REQ;
         else
           next_st = IDLE;
-      NEW_REQ: begin
-        if (~hready_i)
-          next_st = NEW_REQ;
-        else if (hsel_i)
+      NEW_REQ:
+        if (wr_req)
+          next_st = WRITE_REQ;
+        else if (rd_req)
           next_st = WAIT_REQ;
         else
           next_st = IDLE;
-      end
+      WRITE_REQ:
+        next_st = IDLE;
       default: begin
         next_st = IDLE;
       end
@@ -108,17 +155,30 @@ module ahb_to_ri5cy # (
 
   always @ (*) begin
     case(fsm_st)
-    IDLE:
-      if (hready_i)
-        if (hsel_i && ~hwrite_i)
+      IDLE:
+        if (wr_req)
+          req_o = 1'b0;
+        else if (rd_req)
           req_o = 1'b1;
         else
           req_o = 1'b0;
-      else
-        req_o = 1'b0;
-    WAIT_REQ: req_o = 1'b1;
-    NEW_REQ:  req_o = 1'b1;
-    default:  req_o = 1'b0;
+      WAIT_REQ:
+        if (wr_req)
+          req_o = 1'b0;
+        else if (rd_req)
+          req_o = 1'b1;
+        else
+          req_o = 1'b0;
+      NEW_REQ:
+        if (wr_req)
+          req_o = 1'b0;
+        else if (rd_req)
+          req_o = 1'b1;
+        else
+          req_o = 1'b0;
+      WRITE_REQ:
+        req_o = 1'b1;
+      default:  req_o = 1'b0;
     endcase
   end
 endmodule

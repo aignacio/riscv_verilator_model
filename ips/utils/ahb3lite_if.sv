@@ -17,7 +17,3 @@ interface ahb3lite_if #(
   logic HRESP;
 
 endinterface
-
-
-
-

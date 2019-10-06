@@ -42,7 +42,7 @@ module ri5cy_to_ahb # (
               WAIT_REQ  = 1,
               NEW_REQ   = 2;
 
-  logic rvalid;
+  logic rvalid, rvalid_en;
   logic [2:0] hsize;
   logic [31:0] haddr, hwdata_tmp, hwmask;
   logic error_on_transfer;
@@ -64,6 +64,7 @@ module ri5cy_to_ahb # (
                                                             // transfer.
 
   assign error_on_transfer = hresp_i;
+  assign haddr = addr_i;
   assign gnt_o = hreadyout_i;
   assign hready_o = hreadyout_i;
   assign hburst_o = 3'b000; // Always single burst
@@ -90,21 +91,6 @@ module ri5cy_to_ahb # (
     else begin
       hsize = BYTE;
     end
-  end
-
-  always @ (*) begin
-    case (be_i)
-      // 4'b1111:  haddr = addr_i;
-      // 4'b1110:  haddr = {addr_i[31:2],2'd1};
-      // 4'b0011:  haddr = addr_i;
-      // 4'b0110:  haddr = {addr_i[31:2],2'd1};
-      // 4'b1100:  haddr = {addr_i[31:2],2'd2};
-      // 4'b0001:  haddr = addr_i;
-      // 4'b0010:  haddr = {addr_i[31:2],2'd1};
-      // 4'b0100:  haddr = {addr_i[31:2],2'd2};
-      // 4'b1000:  haddr = {addr_i[31:2],2'd3};
-      default:  haddr = addr_i;
-    endcase
   end
 
   always @ (posedge clk) begin
@@ -153,6 +139,23 @@ module ri5cy_to_ahb # (
         hwdata_tmp <= hwmask;
     end
   end
+
+  // always @ (posedge clk) begin
+  //   if (~rstn) begin
+  //     rvalid_en <= 1'b0;
+  //   end
+  //   else begin
+  //     if (req_i == 1'b1 && we_i == 1'b0) begin
+  //       rvalid_en <= 1'b1;
+  //     end
+  //     else if (req_i == 1'b1 && we_i == 1'b1) begin
+  //       rvalid_en <= 1'b0;
+  //     end
+  //     else begin
+  //       rvalid_en <= 1'b0;
+  //     end
+  //   end
+  // end
 
   always @ (*) begin
     case(fsm_st)

@@ -6,8 +6,9 @@ PROJECT_NAME	:=	riscv
 VERILATOR_TB	:=	tb
 IPS_FOLDER		:=	ips
 # Define here the size of the RAMs once it need to check if the program fits
-IRAM_KB_SIZE	:=	32
-DRAM_KB_SIZE	:=	32
+IRAM_KB_SIZE		:=	32
+DRAM_KB_SIZE		:=	32
+JTAG_LOOP_BOOT	:=	1
 
 # Verilator Specific Simulation variables
 OUT_VERILATOR	:=	output_verilator
@@ -118,8 +119,9 @@ SRC_VERILOG		+=	$(SRC_FPNEW)
 SRC_VERILOG		+=	$(SRC_RI5CY)
 SRC_CPP				:=	$(wildcard $(VERILATOR_TB)/cpp/*.cpp)
 INC_CPP				:=	../tb/cpp/elfio
-MACRO_VLOG		:=	IRAM_KB_SIZE=$(IRAM_KB_SIZE)	\
-									DRAM_KB_SIZE=$(DRAM_KB_SIZE)	\
+MACRO_VLOG		:=	IRAM_KB_SIZE=$(IRAM_KB_SIZE)			\
+									DRAM_KB_SIZE=$(DRAM_KB_SIZE)			\
+									JTAG_LOOP_BOOT=$(JTAG_LOOP_BOOT)	\
 									SIMULATION
 
 # Verilator configuration stuff
@@ -149,11 +151,12 @@ VERIL_FLAGS		:=	-O3 										\
 									--trace-max-array	1000	\
 									--trace-max-width 1000	\
 									--cc
-CPPFLAGS_VERI	:=	"$(INCS_CPP) -O3 -g3 -Wall 					\
-									-Werror -Wno-aligned-new 						\
-									-DWAVEFORM_VCD=\"$(WAVEFORM_VCD)\" 	\
-									-DIRAM_KB_SIZE=\"$(IRAM_KB_SIZE)\"	\
-									-DDRAM_KB_SIZE=\"$(DRAM_KB_SIZE)\""
+CPPFLAGS_VERI	:=	"$(INCS_CPP) -O3 -g3 -Wall 						\
+									-Werror -Wno-aligned-new 							\
+									-DWAVEFORM_VCD=\"$(WAVEFORM_VCD)\" 		\
+									-DIRAM_KB_SIZE=\"$(IRAM_KB_SIZE)\"		\
+									-DDRAM_KB_SIZE=\"$(DRAM_KB_SIZE)\"		\
+									-DJTAG_LOOP_BOOT=\"$(JTAG_LOOP_BOOT)\""
 # WARN: rtls order matters in verilator compilation seq.
 VERIL_ARGS		:=	-CFLAGS $(CPPFLAGS_VERI) 			\
 									--top-module $(ROOT_MOD_VERI) \
@@ -185,7 +188,7 @@ all: verilator
 
 ####################### verilator simulation rules #######################
 wave:
-	gtkwave $(WAVEFORM_VCD) $(WAVEFORM_VERI)
+	gtkwave -go $(WAVEFORM_VCD) $(WAVEFORM_VERI)
 
 run: sw $(VERILATOR_EXE)
 	$(VERILATOR_EXE) sw/$(TEST_PROG)/output/$(TEST_PROG).elf

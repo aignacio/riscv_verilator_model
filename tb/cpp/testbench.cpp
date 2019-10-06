@@ -83,66 +83,6 @@ template<class module> class testbench {
         }
 };
 
-// void loadIRAM(testbench<Vriscv_soc> *cpu, const char *program_path, bool en_print) {
-//     uint32_t iram_kb_size = atoi(STRINGIZE_VALUE_OF(IRAM_KB_SIZE));
-//     ifstream program;
-//     string line;
-//     array<uint8_t, 4> bytes;
-//     auto size_prog = 0;
-
-//     program.open(program_path);
-
-//     if (!program) {
-//         cout << "Unable to open file" << endl;
-//         exit(1); // terminate with error
-//     }
-
-//     while (getline(program, line))
-//         size_prog++;
-
-//     if (size_prog*4 > (iram_kb_size*1024)) {
-//         cout << "Program exceds IRAM size!" << endl;
-//         cout << "IRAM size (KB) = " << STRINGIZE_VALUE_OF(IRAM_KB_SIZE) << endl;
-//         cout << "PROGRAM size (KB) = " << (size_prog*4)/1024 << endl;
-//         exit(1); // terminate with error
-//     }
-
-//     program.clear();
-//     program.seekg(0);
-
-//     if (en_print)
-//         cout << "\nIRAM Mem layout:";
-//     for(int i=0;i<size_prog;i++){
-//         getline(program,line);
-//         bytes = hex_str_to_bytes(line);
-//         uint32_t word_val = (bytes[0]<<24)+(bytes[1]<<16)+(bytes[2]<<8)+bytes[3];
-//         // cpu->core->riscv_soc->writeWordIramMem(i,word_val);
-//         if (en_print)
-//             printf("\n WORD[%6d] / ADDR[%8x] / VAL[%8x]",i,i*4,word_val);
-//     }
-//     cpu->loaded = true;
-//     cout << endl;
-// }
-
-// inline uint8_t get_sub(uint8_t character) {
-//     return (character <= '9') ? 0x30 : (character <= 'F') ? 0x37 : 0x57;
-// }
-
-// auto hex_str_to_bytes(const string &str) {
-//     array<uint8_t, 4> bytes;
-//     auto c_str = str.c_str();
-//     uint8_t character;
-
-//     for (int i = 0; i < 4; i++) {
-//         character = *c_str++;
-//         bytes[i] = (character - get_sub(character)) * 16;
-//         character = *c_str++;
-//         bytes[i] += character - get_sub(character);
-//     }
-
-//     return bytes;
-// }
-
 bool loadELF(testbench<Vriscv_soc> *cpu, const char *program_path, const bool en_print){
     ELFIO::elfio program;
 
@@ -256,14 +196,16 @@ int main(int argc, char** argv, char** env){
     cout << "\n[IRAM KB Size] " << STRINGIZE_VALUE_OF(IRAM_KB_SIZE) << "KB";
     cout << "\n[DRAM KB Size] " << STRINGIZE_VALUE_OF(DRAM_KB_SIZE) << "KB \n";
 
-    soc->core->fetch_enable_i = 1;
 
     if (!loadELF(soc, argv[1], true))
         exit(1);
 
-    soc->core->boot_addr_i = 0x1A000080;
+    if (JTAG_LOOP_BOOT)
+        soc->core->boot_addr_i = 0x1A000080;
 
     soc->reset_n(2);
+
+    soc->core->fetch_enable_i = 1;
 
     while(true) {
         rbb->read_cmd(false);

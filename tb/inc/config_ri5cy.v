@@ -2,9 +2,9 @@
 `define CONFIG_RI5CY_V
   `define N_EXT_PERF_COUNTERS 0
   `define INSTR_RDATA_WIDTH   32
-  `define PULP_SECURE         1
+  `define PULP_SECURE         0
   `define N_PMP_ENTRIES       16
-  `define USE_PMP             1
+  `define USE_PMP             0
   `define PULP_CLUSTER        1
   `define FPU                 0
   `define Zfinx               0
@@ -26,4 +26,5 @@
   `define SELECTABLE_HARTS    1
   `define N_OF_HARTS          1
   `define JTAG_DECODE_ID      32'h249511C3
+  `define JTAG_BOOT           `JTAG_LOOP_BOOT
 `endif

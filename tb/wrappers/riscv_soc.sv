@@ -53,6 +53,46 @@ module riscv_soc (
   logic slv_apb_PSLVERR [`APB_SLAVES_NUM];
   logic [`APB_PADDR_SIZE-1:0] slv_apb_PRDATA [`APB_SLAVES_NUM];
 
+  `ifdef USE_RI5CY_JTAG
+    localparam logic [`N_OF_HARTS-1:0] SELECTABLE_HARTS = 1 << `CORE_MHARTID;
+
+    // jtag openocd bridge signals
+    logic                        sim_jtag_tck;
+    logic                        sim_jtag_tms;
+    logic                        sim_jtag_tdi;
+    logic                        sim_jtag_trstn;
+    logic                        sim_jtag_tdo;
+
+    // signals for debug unit
+    logic                        debug_req_ready;
+    dm::dmi_resp_t               debug_resp;
+    logic                        jtag_req_valid;
+    dm::dmi_req_t                jtag_dmi_req;
+    logic                        jtag_resp_ready;
+    logic                        jtag_resp_valid;
+    logic                        ndmreset, ndmreset_n;
+
+    // debug unit slave interface
+    logic                        dm_grant;
+    logic                        dm_rvalid;
+    logic                        dm_req;
+    logic                        dm_we;
+    logic [31:0]                 dm_addr;
+    logic [31:0]                 dm_wdata;
+    logic [31:0]                 dm_rdata;
+    logic [3:0]                  dm_be;
+
+    // debug unit master interface (system bus access)
+    logic                        sb_req;
+    logic [31:0]                 sb_addr;
+    logic                        sb_we;
+    logic [31:0]                 sb_wdata;
+    logic [3:0]                  sb_be;
+    logic                        sb_gnt;
+    logic                        sb_rvalid;
+    logic [31:0]                 sb_rdata;
+  `endif
+
   ahb3lite_if #(`AHB_HADDR_SIZE, `AHB_HDATA_SIZE) ahb_slave [`AHB_SLAVES_NUM] ();
   ahb3lite_if #(`AHB_HADDR_SIZE, `AHB_HDATA_SIZE) ahb_master [`AHB_MASTERS_NUM] ();
   apb4_if #(`APB_PADDR_SIZE, `APB_PDATA_SIZE) apb_ahb_bridge ();
@@ -61,9 +101,9 @@ module riscv_soc (
   assign HCLK = clk;
   assign HRESETn = reset_n;
 
-  assign mst_priority[0] = 2; // IBus
+  assign mst_priority[0] = 1; // IBus
   assign mst_priority[1] = 1; // DBus
-  assign mst_priority[2] = 3; // Debug
+  assign mst_priority[2] = 1; // Debug
 
   // AHB Slave addressing
   assign ahb_slv_addr_base[0] = `AHB_SL_BASE_ADDR_0;
@@ -156,7 +196,7 @@ module riscv_soc (
   ) riscv_cpu (
     // Core control
     .core_clk(clk),
-    .core_rstn(ndmreset_n),
+    .core_rstn(reset_n & ndmreset_n),
     // Control signals
     .clk_en_i('1),
     .boot_addr_i(boot_addr_i),
@@ -215,43 +255,6 @@ module riscv_soc (
   );
 
   `ifdef USE_RI5CY_JTAG
-    localparam logic [`N_OF_HARTS-1:0] SELECTABLE_HARTS = 1 << `CORE_MHARTID;
-
-    // jtag openocd bridge signals
-    logic                        sim_jtag_tck;
-    logic                        sim_jtag_tms;
-    logic                        sim_jtag_tdi;
-    logic                        sim_jtag_trstn;
-    logic                        sim_jtag_tdo;
-
-    // signals for debug unit
-    logic                        debug_req_ready;
-    dm::dmi_resp_t               debug_resp;
-    logic                        jtag_req_valid;
-    dm::dmi_req_t                jtag_dmi_req;
-    logic                        jtag_resp_ready;
-    logic                        jtag_resp_valid;
-    logic                        ndmreset, ndmreset_n;
-
-    // debug unit slave interface
-    logic                        dm_grant;
-    logic                        dm_rvalid;
-    logic                        dm_req;
-    logic                        dm_we;
-    logic [31:0]                 dm_addr;
-    logic [31:0]                 dm_wdata;
-    logic [31:0]                 dm_rdata;
-    logic [3:0]                  dm_be;
-
-    // debug unit master interface (system bus access)
-    logic                        sb_req;
-    logic [31:0]                 sb_addr;
-    logic                        sb_we;
-    logic [31:0]                 sb_wdata;
-    logic [3:0]                  sb_be;
-    logic                        sb_gnt;
-    logic                        sb_rvalid;
-    logic [31:0]                 sb_rdata;
 
     // debug subsystem
     dmi_jtag #(
@@ -396,7 +399,8 @@ module riscv_soc (
 
     ahb_ri5cy_rom # (
       .AHB_ADDR_WIDTH(`AHB_HADDR_SIZE),
-      .AHB_DATA_WIDTH(`AHB_HDATA_SIZE)
+      .AHB_DATA_WIDTH(`AHB_HDATA_SIZE),
+      .JTAG_BOOT(`JTAG_BOOT)
     ) ahb_riscv_rom (
       .clk(clk),
       .rstn(reset_n),
