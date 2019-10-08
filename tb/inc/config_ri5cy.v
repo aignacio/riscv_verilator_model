@@ -2,7 +2,7 @@
 `define CONFIG_RI5CY_V
   `define N_EXT_PERF_COUNTERS 0
   `define INSTR_RDATA_WIDTH   32
-  `define PULP_SECURE         0
+  `define PULP_SECURE         1
   `define N_PMP_ENTRIES       16
   `define USE_PMP             0
   `define PULP_CLUSTER        1

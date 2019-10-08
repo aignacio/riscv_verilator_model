@@ -81,6 +81,11 @@ module ri5cy_ahb_wrapper #(
   input   data_hreadyout_i,
   input   data_hresp_i
 );
+  logic instr_hsel;
+  logic data_hsel;
+  logic error_instr_oor;
+  logic error_data_oor;
+
   logic [31:0] instr_addr;
   logic instr_req;
   logic [31:0] instr_rdata;
@@ -95,6 +100,20 @@ module ri5cy_ahb_wrapper #(
   logic [31:0] data_addr;
   logic [31:0] data_wdata;
   logic [31:0] data_rdata;
+
+  filter_oor ahb_instr_filter(
+    .addr_i(instr_haddr_o),
+    .input_sel_i(instr_hsel),
+    .valid_o(instr_hsel_o),
+    .error_o(error_intr_oor)
+  );
+
+  filter_oor ahb_data_filter(
+    .addr_i(data_haddr_o),
+    .input_sel_i(data_hsel),
+    .valid_o(data_hsel_o),
+    .error_o(error_data_oor)
+  );
 
   ri5cy_to_ahb # (
     .AHB_ADDR_WIDTH(AHB_ADDR_WIDTH),
@@ -112,7 +131,7 @@ module ri5cy_ahb_wrapper #(
     .rvalid_o(instr_rvalid),
     .rdata_o(instr_rdata),
     // AHB master signals
-    .hsel_o(instr_hsel_o),
+    .hsel_o(instr_hsel),
     .haddr_o(instr_haddr_o),
     .hwdata_o(instr_hwdata_o),
     .hwrite_o(instr_hwrite_o),
@@ -143,7 +162,7 @@ module ri5cy_ahb_wrapper #(
     .rvalid_o(data_rvalid),
     .rdata_o(data_rdata),
     // AHB master signals
-    .hsel_o(data_hsel_o),
+    .hsel_o(data_hsel),
     .haddr_o(data_haddr_o),
     .hwdata_o(data_hwdata_o),
     .hwrite_o(data_hwrite_o),

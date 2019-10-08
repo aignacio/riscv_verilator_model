@@ -197,14 +197,12 @@ int main(int argc, char** argv, char** env){
     cout << "\n[DRAM KB Size] " << STRINGIZE_VALUE_OF(DRAM_KB_SIZE) << "KB \n";
 
 
-    if (!loadELF(soc, argv[1], true))
-        exit(1);
-
     if (JTAG_LOOP_BOOT)
         soc->core->boot_addr_i = 0x1A000080;
+    else
+        if (!loadELF(soc, argv[1], true)) exit(1);
 
     soc->reset_n(2);
-
     soc->core->fetch_enable_i = 1;
 
     while(true) {

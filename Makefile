@@ -130,7 +130,7 @@ VERILATOR_EXE	:=	$(OUT_VERILATOR)/$(ROOT_MOD_VERI)
 INCS_CPP			:=	$(addprefix -I,$(INC_CPP))
 INCS_VERILOG	:=	$(addprefix +incdir+,$(INC_VERILOG))
 MACROS_VLOG		:=	$(addprefix +define+,$(MACRO_VLOG))
-WAVEFORM_VCD	:=	$(OUT_VERILATOR)/$(ROOT_MOD_VERI).vcd
+WAVEFORM_VCD	:=	/tmp/riscv_mode.vcd #$(OUT_VERILATOR)/$(ROOT_MOD_VERI).vcd
 WAVEFORM_VERI	:=	$(VERILATOR_TB)/waveform_template/gtkwave_tmpl.gtkw
 VERIL_FLAGS		:=	-O3 										\
 									-Wno-CASEINCOMPLETE 		\

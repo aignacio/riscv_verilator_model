@@ -65,7 +65,7 @@ module ri5cy_to_ahb # (
 
   assign error_on_transfer = hresp_i;
   assign haddr = addr_i;
-  assign gnt_o = hreadyout_i;
+  assign gnt_o = req_i;
   assign hready_o = hreadyout_i;
   assign hburst_o = 3'b000; // Always single burst
   assign hwrite_o = we_i;
@@ -139,23 +139,6 @@ module ri5cy_to_ahb # (
         hwdata_tmp <= hwmask;
     end
   end
-
-  // always @ (posedge clk) begin
-  //   if (~rstn) begin
-  //     rvalid_en <= 1'b0;
-  //   end
-  //   else begin
-  //     if (req_i == 1'b1 && we_i == 1'b0) begin
-  //       rvalid_en <= 1'b1;
-  //     end
-  //     else if (req_i == 1'b1 && we_i == 1'b1) begin
-  //       rvalid_en <= 1'b0;
-  //     end
-  //     else begin
-  //       rvalid_en <= 1'b0;
-  //     end
-  //   end
-  // end
 
   always @ (*) begin
     case(fsm_st)
