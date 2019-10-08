@@ -25,8 +25,8 @@ int main(void) {
     int test = 0;
     bool toggle = false;
 
-    for (int i = 0;i<32;i++)
-        set_gpio_pin_direction(i,DIR_OUT);
+    // for (int i = 0;i<32;i++)
+    //     set_gpio_pin_direction(i,DIR_OUT);
 
     while(1){
         for (int i = 0;i<32;i++)

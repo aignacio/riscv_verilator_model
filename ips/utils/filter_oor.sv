@@ -12,7 +12,6 @@ module filter_oor (
   assign error_o = input_sel_i && ~enable_valid;
 
   always @ (*) begin
-    $display(`AHB_SL_BASE_ADDR_0 + ~(`AHB_SL_MASK_ADDR_0));
     if (input_sel_i &&
         (addr_i >= `AHB_SL_BASE_ADDR_0 && addr_i <= (`AHB_SL_BASE_ADDR_0 + ~(`AHB_SL_MASK_ADDR_0))) ||
         (addr_i >= `AHB_SL_BASE_ADDR_1 && addr_i <= (`AHB_SL_BASE_ADDR_1 + ~(`AHB_SL_MASK_ADDR_1))) ||

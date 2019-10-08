@@ -1,36 +1,18 @@
 .EXPORT_ALL_VARIABLES:
 ################# PROJECT DEPENDENT SETTINGS #################
-PROJECT				:=	riscv_fpga
-XILINX_TARGET	:=	arty
-XILINX_BOARD	:=	digilentinc.com:arty-a7-100:part0:1.0
-XILINX_PART		:=	xc7a100tcsg324-1
-CPU_CORES			?=	8
-TOP_MODULE		:=	artix_wrapper
+PROJECT				:=	$(PROJECT_NAME)_fpga
 PROJECT_NAME	:=	$(shell echo $(PROJECT) | tr A-Z a-z)
-SYNTH_MODE		:=	none
-# Synthesis modes
-# • rebuilt - This will attempt to rebuild the original hierarchy of the RTL design after synthesis
-# has completed. This is the default setting.
-# • full - Flatten the hierarchy of the design.
-# • none - Do not flatten the hierarchy of the design. This will preserve the hierarchy of the
-# design, but will also limit the design optimization that can be performed by the synthesis
-# tool.
 
-# Project files
-
-# List all include folders
+### Project files
 PATH_FILES	:=	$(abspath ../)
-
+# List all include folders
 INCL_DIR		:=	$(addprefix $(PATH_FILES)/,$(INC_VERILOG))
-
 # You can list below all files in the verilog/system verilog format
 PRJ_FILES_V	:=	$(addprefix $(PATH_FILES)/,$(SRC_VERILOG)) \
 								$(PATH_FILES)/tb/wrappers/fpga_wrapper/fpga_wrapper.sv
+MACROS_VLOG	:=	$(MACRO_VLOG)
 
-MACROS_VLOG	:=	$(MACRO_VLOG) \
-								VERILATOR
-
-# You can list below all files in the manifest format (.F - List of all verilog files)
+### You can list below all files in the manifest format (.F - List of all verilog files)
 PRJ_FILES_F	:=
 
 ################# INDEPENDENT SETTINGS #################

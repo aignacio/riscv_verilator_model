@@ -25,8 +25,6 @@ module riscv_soc
   output  jtag_tdo,
   input   jtag_trstn
 );
-
-
   /**********************
     AHB WIREUP SIGNALS
   **********************/

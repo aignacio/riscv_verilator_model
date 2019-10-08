@@ -26,5 +26,4 @@
   `define SELECTABLE_HARTS    1
   `define N_OF_HARTS          1
   `define JTAG_DECODE_ID      32'h249511C3
-  `define JTAG_BOOT           `JTAG_LOOP_BOOT
 `endif

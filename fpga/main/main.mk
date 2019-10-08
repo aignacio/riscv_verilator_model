@@ -15,7 +15,7 @@ else
 		-source	tcl/run.tcl	\
 		-log	$(OUT_DIR)/console.log	\
 		-tclargs	\
-		-top-module	"$(TOP_MODULE)" \
+		-top-module	"$(FPGA_WRAPPER)" \
 		-xil_board	"$(XILINX_BOARD)" \
 		-xil_part	"$(XILINX_PART)" \
 		-v "$(PRJ_FILES_V)" \
