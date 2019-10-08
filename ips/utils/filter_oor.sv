@@ -1,6 +1,6 @@
 `include "config_soc.v"
 
-module filter_oor(
+module filter_oor (
   input   [31:0] addr_i,
   input   input_sel_i,
   output  valid_o,

@@ -38,7 +38,6 @@ COMMON_CELLS	:=	ips/common_cells/include/common_cells/registers.svh	\
 									ips/common_cells/src/rstgen.sv											\
 									ips/common_cells/src/rstgen_bypass.sv
 
-
 SRC_FPNEW			:=	ips/fpnew/src/fpnew_pkg.sv 																		\
 									ips/fpnew/src/fpu_div_sqrt_mvp/hdl/defs_div_sqrt_mvp.sv 			\
 									ips/fpnew/src/fpu_div_sqrt_mvp/hdl/preprocess_mvp.sv 					\
@@ -121,8 +120,7 @@ SRC_CPP				:=	$(wildcard $(VERILATOR_TB)/cpp/*.cpp)
 INC_CPP				:=	../tb/cpp/elfio
 MACRO_VLOG		:=	IRAM_KB_SIZE=$(IRAM_KB_SIZE)			\
 									DRAM_KB_SIZE=$(DRAM_KB_SIZE)			\
-									JTAG_LOOP_BOOT=$(JTAG_LOOP_BOOT)	\
-									SIMULATION
+									JTAG_LOOP_BOOT=$(JTAG_LOOP_BOOT)
 
 # Verilator configuration stuff
 ROOT_MOD_VERI	:=	$(PROJECT_NAME)_soc
@@ -130,6 +128,8 @@ VERILATOR_EXE	:=	$(OUT_VERILATOR)/$(ROOT_MOD_VERI)
 INCS_CPP			:=	$(addprefix -I,$(INC_CPP))
 INCS_VERILOG	:=	$(addprefix +incdir+,$(INC_VERILOG))
 MACROS_VLOG		:=	$(addprefix +define+,$(MACRO_VLOG))
+MACROS_VLOG		+=	$(addprefix +define+,SIMULATION)				# Added later cause MACRO_VLOG it's used by
+																													# vivado, so SIMULATION should not be included
 WAVEFORM_VCD	:=	/tmp/riscv_mode.vcd #$(OUT_VERILATOR)/$(ROOT_MOD_VERI).vcd
 WAVEFORM_VERI	:=	$(VERILATOR_TB)/waveform_template/gtkwave_tmpl.gtkw
 VERIL_FLAGS		:=	-O3 										\
@@ -169,22 +169,44 @@ VERIL_ARGS		:=	-CFLAGS $(CPPFLAGS_VERI) 			\
 									$(SRC_CPP) 										\
 									-o 														\
 									$(ROOT_MOD_VERI)
+
+export SRC_VERILOG
+export INC_VERILOG
+export MACRO_VLOG
+
 ########################################################################
 ###################### DO NOT EDIT ANYTHING BELOW ######################
 ########################################################################
 .PHONY: all clean check install \
-				verilator clean sw run
+				verilator clean sw run fpga
 
 help:
 	@echo "Rules list:"
 	@echo "all		- run verilator_sim"
 	@echo "wave		- open gtkwave with waveform vcd dump"
+	@echo "fpga		- synthetize riscv_soc throught vivado for fpga targets"
 	@echo "clean		- clean verilator output builds"
 	@echo "check		- check dependencies for running the project"
 	@echo "install		- install dependencies through apt-get"
 	@echo "verilator	- compile/run a complete SoC through verilator in C++"
 
 all: verilator
+
+####################### fpga synthesis rules #######################
+fpga:
+	+@make -C fpga force
+
+mcs:
+	+@make -C fpga $@
+
+program_mcs:
+	+@make -C fpga $@
+
+connect_fpga:
+	~/projects/riscv-openocd/src/openocd -f tb/debug/esp-prog.cfg -f tb/debug/riscv_pulp_fpga.cfg
+
+gdb:
+	$(RISCV_TOOLCHAIN)-gdb sw/$(TEST_PROG)/output/$(TEST_PROG).elf -ex "target remote : 3333" -ex "load"
 
 ####################### verilator simulation rules #######################
 wave:
@@ -213,6 +235,7 @@ clean:
 	$(info rm -rf $(OUT_VERILATOR))
 	@rm -rf $(OUT_VERILATOR)
 	+@make -C sw/$(TEST_PROG) clean
+	+@make -C fpga clean
 
 ####################### check for dependencies #######################
 setup: check

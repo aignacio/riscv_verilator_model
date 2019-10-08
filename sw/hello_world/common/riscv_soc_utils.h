@@ -1,7 +1,7 @@
 #ifndef RISCV_SOC_UTILS_H
 #define RISCV_SOC_UTILS_H
 
-#define GPIO_BASE_ADDR      0x100A0000
+#define GPIO_BASE_ADDR      0x500A0000
 #define I2C_BASE_ADDR       0x100B0000
 #define SPI_BASE_ADDR       0x100C0000
 #define UART_BASE_ADDR      0x100D0000

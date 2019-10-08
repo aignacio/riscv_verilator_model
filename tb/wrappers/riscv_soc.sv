@@ -3,27 +3,29 @@
 `include "config_soc.v"
 `ifdef USE_RI5CY
   `include "config_ri5cy.v"
-  `ifdef USE_RI5CY_JTAG
-    import dm::*;
-  `endif
 `endif
 
-module riscv_soc (
-  input   clk,
+module riscv_soc
+`ifdef USE_RI5CY_JTAG  // It's weird to see the import through this way but
+  import dm::*;        // once dm package declares variables with same name
+`endif                 // as riscv_defines, we should use local scope to import (vivado complainss)
+#(
+  parameter USE_SAME_CLOCK_CORE_PERIPH = 1
+)(
+  input   core_clk,
+  input   periph_clk,
   input   reset_n,
   input   [31:0] boot_addr_i,
   input   fetch_enable_i,
-  input   sim_jtag_tck,
-  input   sim_jtag_tms,
-  input   sim_jtag_tdi,
-  output  sim_jtag_tdo,
-  input   sim_jtag_trstn
+  output  [31:0] gpio_out,
+  input   [31:0] gpio_in,
+  input   jtag_tck,
+  input   jtag_tms,
+  input   jtag_tdi,
+  output  jtag_tdo,
+  input   jtag_trstn
 );
-  logic gpio_out;
 
-  logic cpu_boot_addr;
-
-  logic [`N_OF_HARTS-1:0]      dm_debug_req;
 
   /**********************
     AHB WIREUP SIGNALS
@@ -55,13 +57,7 @@ module riscv_soc (
 
   `ifdef USE_RI5CY_JTAG
     localparam logic [`N_OF_HARTS-1:0] SELECTABLE_HARTS = 1 << `CORE_MHARTID;
-
-    // jtag openocd bridge signals
-    logic                        sim_jtag_tck;
-    logic                        sim_jtag_tms;
-    logic                        sim_jtag_tdi;
-    logic                        sim_jtag_trstn;
-    logic                        sim_jtag_tdo;
+    logic [`N_OF_HARTS-1:0] dm_debug_req;
 
     // signals for debug unit
     logic                        debug_req_ready;
@@ -98,7 +94,7 @@ module riscv_soc (
   apb4_if #(`APB_PADDR_SIZE, `APB_PDATA_SIZE) apb_ahb_bridge ();
   apb4_if #(`APB_PADDR_SIZE, `APB_PDATA_SIZE) apb_slaves [`APB_SLAVES_NUM] ();
 
-  assign HCLK = clk;
+  assign HCLK = core_clk;
   assign HRESETn = reset_n;
 
   assign mst_priority[0] = 1; // IBus
@@ -195,7 +191,7 @@ module riscv_soc (
     .DM_HaltAddress(`DM_HaltAddress)
   ) riscv_cpu (
     // Core control
-    .core_clk(clk),
+    .core_clk(core_clk),
     .core_rstn(reset_n & ndmreset_n),
     // Control signals
     .clk_en_i('1),
@@ -260,7 +256,7 @@ module riscv_soc (
     dmi_jtag #(
       .IdcodeValue          ( `JTAG_DECODE_ID )
     ) i_dmi_jtag (
-      .clk_i                ( clk             ),
+      .clk_i                ( core_clk        ),
       .rst_ni               ( reset_n         ),
       .testmode_i           ( 1'b0            ),
       .dmi_req_o            ( jtag_dmi_req    ),
@@ -270,11 +266,11 @@ module riscv_soc (
       .dmi_resp_ready_o     ( jtag_resp_ready ),
       .dmi_resp_valid_i     ( jtag_resp_valid ),
       .dmi_rst_no           (                 ), // not connected
-      .tck_i                ( sim_jtag_tck    ),
-      .tms_i                ( sim_jtag_tms    ),
-      .trst_ni              ( sim_jtag_trstn  ),
-      .td_i                 ( sim_jtag_tdi    ),
-      .td_o                 ( sim_jtag_tdo    ),
+      .tck_i                ( jtag_tck        ),
+      .tms_i                ( jtag_tms        ),
+      .trst_ni              ( jtag_trstn      ),
+      .td_i                 ( jtag_tdi        ),
+      .td_o                 ( jtag_tdo        ),
       .tdo_oe_o             (                 )
     );
 
@@ -283,7 +279,7 @@ module riscv_soc (
       .BusWidth          ( `AHB_HADDR_SIZE   ),
       .SelectableHarts   ( `SELECTABLE_HARTS )
     ) i_dm_top (
-      .clk_i             ( clk               ),
+      .clk_i             ( core_clk          ),
       .rst_ni            ( reset_n           ),
       .testmode_i        ( 1'b0              ),
       .ndmreset_o        ( ndmreset          ),
@@ -320,7 +316,7 @@ module riscv_soc (
     // grant in the same cycle
     assign dm_gnt = dm_req;
     // valid read/write in the next cycle
-    always_ff @(posedge clk or negedge reset_n) begin : dm_valid_handler
+    always_ff @(posedge core_clk or negedge reset_n) begin : dm_valid_handler
       if(~reset_n) begin
         dm_rvalid <= '0;
       end else begin
@@ -330,7 +326,7 @@ module riscv_soc (
 
     // reset handling with ndmreset
     rstgen i_rstgen_main (
-      .clk_i        ( clk                   ),
+      .clk_i        ( core_clk              ),
       .rst_ni       ( reset_n & (~ndmreset) ),
       .test_mode_i  ( '0                    ),
       .rst_no       ( ndmreset_n            ),
@@ -341,7 +337,7 @@ module riscv_soc (
       .AHB_ADDR_WIDTH(`AHB_HADDR_SIZE),
       .AHB_DATA_WIDTH(`AHB_HDATA_SIZE)
     ) debug_unit_ahb_master (
-      .clk(clk),
+      .clk(core_clk),
       .rstn(reset_n),
       // Custom RI5CY memory interface
       .req_i(sb_req),
@@ -372,7 +368,7 @@ module riscv_soc (
       .AHB_ADDR_WIDTH(`AHB_HADDR_SIZE),
       .AHB_DATA_WIDTH(`AHB_HDATA_SIZE)
     ) ahb_slave_debug_unit (
-      .clk(clk),
+      .clk(core_clk),
       .rstn(reset_n),
       // Custom RI5CY memory interface
       .req_o(dm_req),
@@ -402,7 +398,7 @@ module riscv_soc (
       .AHB_DATA_WIDTH(`AHB_HDATA_SIZE),
       .JTAG_BOOT(`JTAG_BOOT)
     ) ahb_riscv_rom (
-      .clk(clk),
+      .clk(core_clk),
       .rstn(reset_n),
       // AHB slave signals
       .hsel_i(ahb_slave[5].HSEL),
@@ -498,7 +494,7 @@ module riscv_soc (
     .REGISTERED_OUTPUT("NO")
   ) instr_ram (
     .HRESETn(reset_n),
-    .HCLK(clk),
+    .HCLK(core_clk),
     .HSEL(ahb_slave[0].HSEL),
     .HADDR(ahb_slave[0].HADDR),
     .HWDATA(ahb_slave[0].HWDATA),
@@ -522,7 +518,7 @@ module riscv_soc (
     .REGISTERED_OUTPUT("NO")
   ) data_ram (
     .HRESETn(reset_n),
-    .HCLK(clk),
+    .HCLK(core_clk),
     .HSEL(ahb_slave[1].HSEL),
     .HADDR(ahb_slave[1].HADDR),
     .HWDATA(ahb_slave[1].HWDATA),
@@ -546,7 +542,7 @@ module riscv_soc (
   ) ahb_to_apb (
     //AHB Slave Interface
     .HRESETn(reset_n),
-    .HCLK(clk),
+    .HCLK(core_clk),
     .HSEL(ahb_slave[2].HSEL),
     .HADDR(ahb_slave[2].HADDR),
     .HWDATA(ahb_slave[2].HWDATA),
@@ -562,7 +558,7 @@ module riscv_soc (
     .HRESP(ahb_slave[2].HRESP),
     //APB Master Interface
     .PRESETn(reset_n),
-    .PCLK(clk),
+    .PCLK(USE_SAME_CLOCK_CORE_PERIPH ? core_clk : periph_clk),
     .PSEL(apb_ahb_bridge.PSEL),
     .PENABLE(apb_ahb_bridge.PENABLE),
     .PPROT(apb_ahb_bridge.PPROT),
@@ -580,7 +576,7 @@ module riscv_soc (
     .HDATA_SIZE(`AHB_HDATA_SIZE)
   ) printf_verilator (
     .HRESETn(reset_n),
-    .HCLK(clk),
+    .HCLK(core_clk),
     .HSEL(ahb_slave[3].HSEL),
     .HADDR(ahb_slave[3].HADDR),
     .HWDATA(ahb_slave[3].HWDATA),
@@ -601,7 +597,7 @@ module riscv_soc (
     .SLAVES(`APB_SLAVES_NUM)
   ) apb_bus (
     .PRESETn(reset_n),
-    .PCLK(clk),
+    .PCLK(USE_SAME_CLOCK_CORE_PERIPH ? core_clk : periph_clk),
     .MST_PSEL(apb_ahb_bridge.PSEL),
     .MST_PADDR(apb_ahb_bridge.PADDR),
     .MST_PRDATA(apb_ahb_bridge.PRDATA),
@@ -629,7 +625,7 @@ module riscv_soc (
   apb_gpio #(
     .APB_ADDR_WIDTH(12)
   ) gpio_0 (
-    .HCLK(clk),
+    .HCLK(USE_SAME_CLOCK_CORE_PERIPH ? core_clk : periph_clk),
     .HRESETn(reset_n),
     .dft_cg_enable_i(1'b0),
     .PADDR(apb_ahb_bridge.PADDR[11:0]),
@@ -642,7 +638,7 @@ module riscv_soc (
     .PSLVERR(apb_slaves[0].PSLVERR),
     .gpio_in('0),
     .gpio_in_sync(),
-    .gpio_out(),
+    .gpio_out(gpio_out),
     .gpio_dir(),
     .gpio_padcfg(),
     .interrupt()
@@ -651,7 +647,7 @@ module riscv_soc (
   apb_gpio #(
     .APB_ADDR_WIDTH(12)
   ) gpio_1 (
-    .HCLK(clk),
+    .HCLK(USE_SAME_CLOCK_CORE_PERIPH ? core_clk : periph_clk),
     .HRESETn(reset_n),
     .dft_cg_enable_i(1'b0),
     .PADDR(apb_ahb_bridge.PADDR[11:0]),
@@ -662,7 +658,7 @@ module riscv_soc (
     .PRDATA(apb_slaves[1].PRDATA),
     .PREADY(apb_slaves[1].PREADY),
     .PSLVERR(apb_slaves[1].PSLVERR),
-    .gpio_in('0),
+    .gpio_in(gpio_in),
     .gpio_in_sync(),
     .gpio_out(),
     .gpio_dir(),

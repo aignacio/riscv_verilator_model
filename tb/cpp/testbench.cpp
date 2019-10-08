@@ -37,11 +37,11 @@ template<class module> class testbench {
         virtual void reset_n(int rst_cyc) {
             for (int i=0;i<rst_cyc;i++) {
                 core->reset_n = 0;
-                core->sim_jtag_trstn = 0;
+                core->jtag_trstn = 0;
                 this->tick();
             }
             core->reset_n = 1;
-            core->sim_jtag_trstn = 1;
+            core->jtag_trstn = 1;
             this->tick();
         }
 
@@ -67,12 +67,12 @@ template<class module> class testbench {
             if (core->riscv_soc->printfbufferReq())
                 getDataNextCycle = true;
 
-            core->clk = 0;
+            core->core_clk = 0;
             core->eval();
             tick_counter++;
             if(trace) trace->dump(tick_counter);
 
-            core->clk = 1;
+            core->core_clk = 1;
             core->eval();
             tick_counter++;
             if(trace) trace->dump(tick_counter);
@@ -181,21 +181,20 @@ int main(int argc, char** argv, char** env){
     unsigned char srst_pin;
     unsigned char trst_pin;
 
-    soc->opentrace(STRINGIZE_VALUE_OF(WAVEFORM_VCD));
+    // soc->opentrace(STRINGIZE_VALUE_OF(WAVEFORM_VCD));
 
-    rbb->tck_pin   = &soc->core->sim_jtag_tck;
-    rbb->tms_pin   = &soc->core->sim_jtag_tms;
-    rbb->tdi_pin   = &soc->core->sim_jtag_tdi;
-    rbb->tdo_pin   = &soc->core->sim_jtag_tdo;
+    rbb->tck_pin   = &soc->core->jtag_tck;
+    rbb->tms_pin   = &soc->core->jtag_tms;
+    rbb->tdi_pin   = &soc->core->jtag_tdi;
+    rbb->tdo_pin   = &soc->core->jtag_tdo;
     rbb->trst_pin  = &trst_pin; // Must pass a address to the object member
     rbb->srst_pin  = &srst_pin; // Must pass a address to the object member
-    rbb->trstn_pin = &soc->core->sim_jtag_trstn;
+    rbb->trstn_pin = &soc->core->jtag_trstn;
 
     cout << "\n[RISCV SoC] Emulator started";
     cout << "\n[VCD File] " << STRINGIZE_VALUE_OF(WAVEFORM_VCD);
     cout << "\n[IRAM KB Size] " << STRINGIZE_VALUE_OF(IRAM_KB_SIZE) << "KB";
     cout << "\n[DRAM KB Size] " << STRINGIZE_VALUE_OF(DRAM_KB_SIZE) << "KB \n";
-
 
     if (JTAG_LOOP_BOOT)
         soc->core->boot_addr_i = 0x1A000080;
