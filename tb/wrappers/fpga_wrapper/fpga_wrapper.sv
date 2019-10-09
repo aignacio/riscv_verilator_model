@@ -1,7 +1,7 @@
 `include "config_soc.v"
 
 module artix_wrapper (
-  input   clk_100MHz,
+  input   clk_sys,
   input   reset_n,
   // JTAG Interface
   input   jtag_tck,
@@ -19,7 +19,7 @@ module artix_wrapper (
 
   mmcm clk_mmcm (
     // Clock in ports
-    .clk_in(clk_100MHz),
+    .clk_in(clk_sys),
     // Clock out ports
     .core_clk(core_clk),
     .periph_clk(periph_clk),

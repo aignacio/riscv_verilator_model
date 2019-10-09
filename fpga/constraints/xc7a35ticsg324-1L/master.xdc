@@ -1,4 +1,10 @@
-set_property -dict {PACKAGE_PIN E3 IOSTANDARD LVCMOS33} [get_ports clk_100MHz]
+set_property -dict {PACKAGE_PIN E3 IOSTANDARD LVCMOS33} [get_ports clk_sys]
+
+set_property -dict {PACKAGE_PIN H2 IOSTANDARD LVCMOS33} [get_ports jtag_tck]
+set_property -dict {PACKAGE_PIN D3 IOSTANDARD LVCMOS33} [get_ports jtag_tms]
+set_property -dict {PACKAGE_PIN F4 IOSTANDARD LVCMOS33} [get_ports jtag_tdi]
+set_property -dict {PACKAGE_PIN F3 IOSTANDARD LVCMOS33} [get_ports jtag_tdo]
+set_property -dict {PACKAGE_PIN E2 IOSTANDARD LVCMOS33} [get_ports jtag_trstn]
 
 ## Switches
 set_property -dict {PACKAGE_PIN A8 IOSTANDARD LVCMOS33}  [get_ports {gpio_in[0]}]
@@ -28,11 +34,16 @@ set_property -dict {PACKAGE_PIN K1 IOSTANDARD LVCMOS33} [get_ports {gpio_out[0]}
 # set_property -dict {PACKAGE_PIN A9 IOSTANDARD LVCMOS33} [get_ports uart_rx_mirror]
 
 ## Pmod Header JD
-set_property -dict {PACKAGE_PIN H2 IOSTANDARD LVCMOS33} [get_ports jtag_tck]   # JD9
-set_property -dict {PACKAGE_PIN D3 IOSTANDARD LVCMOS33} [get_ports jtag_tms]   # JD2
-set_property -dict {PACKAGE_PIN F4 IOSTANDARD LVCMOS33} [get_ports jtag_tdi]   # JD3
-set_property -dict {PACKAGE_PIN F3 IOSTANDARD LVCMOS33} [get_ports jtag_tdo]   # JD4
-set_property -dict {PACKAGE_PIN E2 IOSTANDARD LVCMOS33} [get_ports jtag_trstn] # JD7
+## JD9
+# set_property -dict {PACKAGE_PIN H2 IOSTANDARD LVCMOS33} [get_ports {jtag_tck}]
+## JD2
+## set_property -dict {PACKAGE_PIN D3 IOSTANDARD LVCMOS33} [get_ports {jtag_tms}]
+## JD3
+## set_property -dict {PACKAGE_PIN F4 IOSTANDARD LVCMOS33} [get_ports {jtag_tdi}]
+## JD4
+## set_property -dict {PACKAGE_PIN F3 IOSTANDARD LVCMOS33} [get_ports {jtag_tdo}]
+## JD7
+## set_property -dict {PACKAGE_PIN E2 IOSTANDARD LVCMOS33} [get_ports {jtag_trstn}]
 
 ## Misc. ChipKit Ports
 set_property -dict {PACKAGE_PIN C2 IOSTANDARD LVCMOS33} [get_ports reset_n]

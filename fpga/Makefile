@@ -1,6 +1,6 @@
 .EXPORT_ALL_VARIABLES:
 ################# PROJECT DEPENDENT SETTINGS #################
-PROJECT				:=	$(PROJECT_NAME)_fpga
+PROJECT				:=	$(PROJECT_NAME)_$(FPGA_BOARD)
 PROJECT_NAME	:=	$(shell echo $(PROJECT) | tr A-Z a-z)
 
 ### Project files

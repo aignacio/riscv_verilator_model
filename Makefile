@@ -20,18 +20,27 @@ ifeq ($(FPGA_BOARD),artix_a35)
 	XILINX_BOARD	:=	digilentinc.com:arty-a7-35:part0:1.0
 	XILINX_PART		:=	xc7a35ticsg324-1L
 	XILINX_TARGET	:=	arty
+	HW_PART				:=	xc7a35t_0
+	MEM_PART			:=	mt25ql128-spi-x1_x2_x4
 else ifeq ($(FPGA_BOARD),artix_a100)
 	XILINX_BOARD	:=	digilentinc.com:arty-a7-100:part0:1.0
 	XILINX_PART		:=	xc7a100tcsg324-1
 	XILINX_TARGET	:=	arty
+	HW_PART				:=	xc7a100t_0
+	MEM_PART			:=	s25fl128sxxxxxx0-spi-x1_x2_x4
 else ifeq ($(FPGA_BOARD),pynq)
 	XILINX_BOARD	:=	digilentinc.com:PYNQ-Z1:part0:1.0
 	XILINX_PART		:=	xc7z020clg400-1
 	XILINX_TARGET	:=	arty
+	HW_PART				:=	xc7a100t_0
+	MEM_PART			:=	mt25ql128-spi-x1_x2_x4
+	#xilinx.com:zc702:1.0
 else
 	XILINX_BOARD	:=	digilentinc.com:arty-a7-35:part0:1.0
 	XILINX_PART		:=	xc7a35ticsg324-1L
 	XILINX_TARGET	:=	arty
+	HW_PART				:=	xc7a35t_0
+	MEM_PART			:=	mt25ql128-spi-x1_x2_x4
 endif
 
 # Synthesis modes
@@ -209,12 +218,14 @@ export XILINX_TARGET
 export CPU_CORES
 export FPGA_WRAPPER
 export SYNTH_MODE
-
+export FPGA_BOARD
+export HW_PART
+export MEM_PART
 ########################################################################
 ###################### DO NOT EDIT ANYTHING BELOW ######################
 ########################################################################
 .PHONY: all clean check install \
-				verilator clean sw run fpga
+				verilator clean sw run
 
 help:
 	@echo "Rules list:"
@@ -229,6 +240,7 @@ help:
 all: verilator
 
 ####################### FPGA synthesis rules #######################
+.PHONY: openocd_fpga program_mcs mcs fpga
 fpga:
 	+@make -C fpga force
 
@@ -239,7 +251,7 @@ program_mcs:
 	+@make -C fpga $@
 
 openocd_fpga:
-	riscv-openocd -f tb/debug/bus-pirate.cfg -f tb/debug/riscv_pulp_fpga.cfg
+	riscv-openocd -f tb/debug/esp-prog.cfg -f tb/debug/riscv_pulp_fpga.cfg
 
 ####################### verilator simulation rules #######################
 wave:
