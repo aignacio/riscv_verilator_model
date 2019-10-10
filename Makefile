@@ -11,7 +11,7 @@ IRAM_KB_SIZE	:=	32
 DRAM_KB_SIZE	:=	32
 JTAG_BOOT			:=	1
 ##### FPGA makefile variables
-FPGA_BOARD		:=	artix_a35
+FPGA_BOARD		:=	pynq
 CPU_CORES			:=	8
 FPGA_WRAPPER	:=	artix_wrapper
 SYNTH_MODE		:=	none
@@ -29,7 +29,7 @@ else ifeq ($(FPGA_BOARD),artix_a100)
 	HW_PART				:=	xc7a100t_0
 	MEM_PART			:=	s25fl128sxxxxxx0-spi-x1_x2_x4
 else ifeq ($(FPGA_BOARD),pynq)
-	XILINX_BOARD	:=	digilentinc.com:PYNQ-Z1:part0:1.0
+	XILINX_BOARD	:=	www.digilentinc.com:pynq-z1:part0:1.0
 	XILINX_PART		:=	xc7z020clg400-1
 	XILINX_TARGET	:=	arty
 	HW_PART				:=	xc7a100t_0
