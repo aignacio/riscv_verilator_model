@@ -15,7 +15,7 @@ JTAG_BOOT			?=	0
 JTAG_PORT			?=	8080
 MAX_THREAD		?=	$(shell nproc --all)
 ##### FPGA makefile variables
-FPGA_BOARD		:=	pynq
+FPGA_BOARD		:=	artix_a35
 CPU_CORES			:=	8
 FPGA_WRAPPER	:=	artix_wrapper
 SYNTH_MODE		:=	none
@@ -36,8 +36,8 @@ else ifeq ($(FPGA_BOARD),pynq)
 	XILINX_BOARD	:=	www.digilentinc.com:pynq-z1:part0:1.0
 	XILINX_PART		:=	xc7z020clg400-1
 	XILINX_TARGET	:=	arty
-	HW_PART				:=	xc7a100t_0
-	MEM_PART			:=	mt25ql128-spi-x1_x2_x4
+	HW_PART				:=	xc7z020_1
+	MEM_PART			:=	s25fl128s-3.3v-qspi-x4-single
 	#xilinx.com:zc702:1.0
 else
 	XILINX_BOARD	:=	digilentinc.com:arty-a7-35:part0:1.0
@@ -258,7 +258,7 @@ program_mcs:
 	+@make -C fpga $@
 
 openocd_fpga:
-	riscv-openocd -f tb/debug/bus-pirate.cfg -f tb/debug/riscv_pulp_fpga.cfg
+	riscv-openocd -f tb/debug/esp-prog.cfg -f tb/debug/riscv_pulp_fpga.cfg
 
 ####################### verilator simulation rules #######################
 .PHONY: wave run verilator sw openocd gdb clean

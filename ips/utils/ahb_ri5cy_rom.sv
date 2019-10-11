@@ -38,7 +38,7 @@ module ahb_ri5cy_rom # (
   logic [2:0] fsm_st, next_st;
   logic [31:0] rdata;
 
-  assign hrdata_o     = JTAG_BOOT ? 'h6f : rdata;
+  assign hrdata_o     = 'h6f; //JTAG_BOOT ? 'h6f : rdata; // Keep looping while(1)
   assign hreadyout_o  = 1'b1;
   assign hresp_o      = 1'b0;
 

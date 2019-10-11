@@ -105,7 +105,7 @@ module ri5cy_ahb_wrapper #(
     .addr_i(instr_haddr_o),
     .input_sel_i(instr_hsel),
     .valid_o(instr_hsel_o),
-    .error_o(error_intr_oor)
+    .error_o(error_instr_oor)
   );
 
   filter_oor ahb_data_filter(

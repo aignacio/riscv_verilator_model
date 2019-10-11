@@ -95,35 +95,38 @@ module riscv_soc
   assign HCLK = core_clk;
   assign HRESETn = reset_n;
 
-  assign mst_priority[0] = 1; // IBus
-  assign mst_priority[1] = 1; // DBus
-  assign mst_priority[2] = 1; // Debug
+  initial begin
+    $display("\n");
+    $display("AHB Addresses:");
+    $display("[Slv ID][Start][End][Mask]");
+    for (int p=0;p<`AHB_SLAVES_NUM;p++)
+      $display("[%d]-[%h][%h][%h]",p,ahb_addr[0][p],ahb_addr[1][p],~(ahb_addr[1][p]-ahb_addr[0][p]));
+    $display("\n");
+    $display("APB Addresses:");
+    for (int p=0;p<`APB_SLAVES_NUM;p++)
+      $display("[%d]-[%h][%h][%h]",p,apb_addr[0][p],apb_addr[1][p],~(apb_addr[1][p]-apb_addr[0][p]));
+    $display("\n");
+  end
 
-  // AHB Slave addressing
-  assign ahb_slv_addr_base[0] = `AHB_SL_BASE_ADDR_0;
-  assign ahb_slv_addr_base[1] = `AHB_SL_BASE_ADDR_1;
-  assign ahb_slv_addr_base[2] = `AHB_SL_BASE_ADDR_2;
-  assign ahb_slv_addr_base[3] = `AHB_SL_BASE_ADDR_3;
-  assign ahb_slv_addr_base[4] = `AHB_SL_BASE_ADDR_4;
-  assign ahb_slv_addr_base[5] = `AHB_SL_BASE_ADDR_5;
+  // AHB & APB Slave addressing
+  genvar n, k, j;
+  generate
+    for (n=0; n < `AHB_MASTERS_NUM; n++) begin
+      assign mst_priority[n] = 1;
+    end
 
-  assign ahb_slv_addr_mask[0] = `AHB_SL_MASK_ADDR_0;
-  assign ahb_slv_addr_mask[1] = `AHB_SL_MASK_ADDR_1;
-  assign ahb_slv_addr_mask[2] = `AHB_SL_MASK_ADDR_2;
-  assign ahb_slv_addr_mask[3] = `AHB_SL_MASK_ADDR_3;
-  assign ahb_slv_addr_mask[4] = `AHB_SL_MASK_ADDR_4;
-  assign ahb_slv_addr_mask[5] = `AHB_SL_MASK_ADDR_5;
+    for (k=0; k < `AHB_SLAVES_NUM; k++) begin
+      //  mask  -->  mask = ~(FINAL ADDRESS - BASE ADDRESS)
+      assign ahb_slv_addr_base[k] = ahb_addr[0][k];
+      assign ahb_slv_addr_mask[k] = ~(ahb_addr[1][k]-ahb_addr[0][k]);
+    end
 
-  // APB Slave addressing
-  assign apb_slv_addr_base[0] = `APB_SL_BASE_ADDR_0;
-  assign apb_slv_addr_base[1] = `APB_SL_BASE_ADDR_1;
-  // assign apb_slv_addr_base[2] = `APB_SL_BASE_ADDR_2;
-  // assign apb_slv_addr_base[3] = `APB_SL_BASE_ADDR_3;
-
-  assign apb_slv_addr_mask[0] = `APB_SL_MASK_ADDR_0;
-  assign apb_slv_addr_mask[1] = `APB_SL_MASK_ADDR_1;
-  // assign apb_slv_addr_mask[2] = `APB_SL_MASK_ADDR_2;
-  // assign apb_slv_addr_mask[3] = `APB_SL_MASK_ADDR_3;
+    for (j=0; j < `APB_SLAVES_NUM; j++) begin
+      //  mask  -->  mask = ~(FINAL ADDRESS - BASE ADDRESS)
+      assign apb_slv_addr_base[j] = apb_addr[0][j];
+      assign apb_slv_addr_mask[j] = ~(apb_addr[1][j]-apb_addr[0][j]);
+    end
+  endgenerate
 
   genvar m, s;
   generate
@@ -376,100 +379,21 @@ module riscv_soc
       .wdata_o(dm_wdata),
       .rdata_i(dm_rdata),
       // AHB slave signals
-      .hsel_i(ahb_slave[4].HSEL),
-      .haddr_i(ahb_slave[4].HADDR),
-      .hwdata_i(ahb_slave[4].HWDATA),
-      .hwrite_i(ahb_slave[4].HWRITE),
-      .hsize_i(ahb_slave[4].HSIZE),
-      .hburst_i(ahb_slave[4].HBURST),
-      .hprot_i(ahb_slave[4].HPROT),
-      .htrans_i(ahb_slave[4].HTRANS),
-      .hmastlock_i(ahb_slave[4].HMASTLOCK),
-      .hready_i(ahb_slave[4].HREADY),
-      .hrdata_o(ahb_slave[4].HRDATA),
-      .hreadyout_o(ahb_slave[4].HREADYOUT),
-      .hresp_o(ahb_slave[4].HRESP)
-    );
-
-    ahb_ri5cy_rom # (
-      .AHB_ADDR_WIDTH(`AHB_HADDR_SIZE),
-      .AHB_DATA_WIDTH(`AHB_HDATA_SIZE),
-      .JTAG_BOOT(`JTAG_BOOT)
-    ) ahb_riscv_rom (
-      .clk(core_clk),
-      .rstn(reset_n),
-      // AHB slave signals
-      .hsel_i(ahb_slave[5].HSEL),
-      .haddr_i(ahb_slave[5].HADDR),
-      .hwdata_i(ahb_slave[5].HWDATA),
-      .hwrite_i(ahb_slave[5].HWRITE),
-      .hsize_i(ahb_slave[5].HSIZE),
-      .hburst_i(ahb_slave[5].HBURST),
-      .hprot_i(ahb_slave[5].HPROT),
-      .htrans_i(ahb_slave[5].HTRANS),
-      .hmastlock_i(ahb_slave[5].HMASTLOCK),
-      .hready_i(ahb_slave[5].HREADY),
-      .hrdata_o(ahb_slave[5].HRDATA),
-      .hreadyout_o(ahb_slave[5].HREADYOUT),
-      .hresp_o(ahb_slave[5].HRESP)
+      .hsel_i(ahb_slave[1].HSEL),
+      .haddr_i(ahb_slave[1].HADDR),
+      .hwdata_i(ahb_slave[1].HWDATA),
+      .hwrite_i(ahb_slave[1].HWRITE),
+      .hsize_i(ahb_slave[1].HSIZE),
+      .hburst_i(ahb_slave[1].HBURST),
+      .hprot_i(ahb_slave[1].HPROT),
+      .htrans_i(ahb_slave[1].HTRANS),
+      .hmastlock_i(ahb_slave[1].HMASTLOCK),
+      .hready_i(ahb_slave[1].HREADY),
+      .hrdata_o(ahb_slave[1].HRDATA),
+      .hreadyout_o(ahb_slave[1].HREADYOUT),
+      .hresp_o(ahb_slave[1].HRESP)
     );
   `endif
-`else
-  // riscorvo_ahb_top # (
-  //   .AHB_ADDR_WIDTH(`AHB_HADDR_SIZE),
-  //   .AHB_DATA_WIDTH(`AHB_HDATA_SIZE),
-  //   .FIFO_SLOTS(8),
-  //   .TRAP_BASE_ADDR(`SYSTEM_TRAP_VECTOR),
-  //   .ENABLE_COMPRESSED_ISA(1),
-  //   .ENABLE_MULT_DIV_ISA(1),
-  //   .ENABLE_MISALIGN_ADDR(1),
-  //   .ENABLE_CUSTOM_ISA(1),
-  //   .SW_NESTED_INT_EN(1)
-  // ) riscv_cpu (
-  //   .clk(clk),
-  //   .reset_n(reset_n),
-  //   .boot_addr_i(boot_addr_i),
-  //   .sync_trap_o(),
-  //   .irq_soft_i(1'b0),
-  //   .irq_i(1'b0),
-  //   .irq_id_i(5'd0),
-  //   .irq_id_ack_o(),
-  //   .irq_ack_o(),
-  //   // Custom instruction interface
-  //   .xs_valid_o(),
-  //   .xs_custom_o(),
-  //   .xs_funct7_o(),
-  //   .xs_rs1_o(),
-  //   .xs_rs2_o(),
-  //   // AHB Master instruction interface
-  //   .instr_hsel_o(ahb_master[0].HSEL),
-  //   .instr_haddr_o(ahb_master[0].HADDR),
-  //   .instr_hwdata_o(ahb_master[0].HWDATA),
-  //   .instr_hwrite_o(ahb_master[0].HWRITE),
-  //   .instr_hsize_o(ahb_master[0].HSIZE),
-  //   .instr_hburst_o(ahb_master[0].HBURST),
-  //   .instr_hprot_o(ahb_master[0].HPROT),
-  //   .instr_htrans_o(ahb_master[0].HTRANS),
-  //   .instr_hmastlock_o(ahb_master[0].HMASTLOCK),
-  //   .instr_hready_o(ahb_master[0].HREADY),
-  //   .instr_hrdata_i(ahb_master[0].HRDATA),
-  //   .instr_hreadyout_i(ahb_master[0].HREADYOUT),
-  //   .instr_hresp_i(ahb_master[0].HRESP),
-  //   // AHB Master data interface
-  //   .data_hsel_o(ahb_master[1].HSEL),
-  //   .data_haddr_o(ahb_master[1].HADDR),
-  //   .data_hwdata_o(ahb_master[1].HWDATA),
-  //   .data_hwrite_o(ahb_master[1].HWRITE),
-  //   .data_hsize_o(ahb_master[1].HSIZE),
-  //   .data_hburst_o(ahb_master[1].HBURST),
-  //   .data_hprot_o(ahb_master[1].HPROT),
-  //   .data_htrans_o(ahb_master[1].HTRANS),
-  //   .data_hmastlock_o(ahb_master[1].HMASTLOCK),
-  //   .data_hready_o(ahb_master[1].HREADY),
-  //   .data_hrdata_i(ahb_master[1].HRDATA),
-  //   .data_hreadyout_i(ahb_master[1].HREADYOUT),
-  //   .data_hresp_i(ahb_master[1].HRESP)
-  // );
 `endif
 
   ahb3lite_interconnect #(
@@ -483,62 +407,33 @@ module riscv_soc
     .*
   );
 
-  ahb3lite_sram1rw #(
-    .MEM_SIZE(0),
-    .MEM_DEPTH(`IRAM_SIZE),               // Need to receive number of words = (KB*1024)/4 bytes
-    .HADDR_SIZE(`AHB_IRAM_ADDR_WIDTH),
-    .HDATA_SIZE(32),
-    .TECHNOLOGY("GENERIC"),
-    .REGISTERED_OUTPUT("NO")
-  ) instr_ram (
-    .HRESETn(reset_n),
-    .HCLK(core_clk),
-    .HSEL(ahb_slave[0].HSEL),
-    .HADDR(ahb_slave[0].HADDR),
-    .HWDATA(ahb_slave[0].HWDATA),
-    .HRDATA(ahb_slave[0].HRDATA),
-    .HWRITE(ahb_slave[0].HWRITE),
-    .HSIZE(ahb_slave[0].HSIZE),
-    .HBURST(ahb_slave[0].HBURST),
-    .HPROT(ahb_slave[0].HPROT),
-    .HTRANS(ahb_slave[0].HTRANS),
-    .HREADYOUT(ahb_slave[0].HREADYOUT),
-    .HREADY(ahb_slave[0].HREADY),
-    .HRESP(ahb_slave[0].HRESP)
+  ahb_ri5cy_rom # (
+    .AHB_ADDR_WIDTH(`AHB_HADDR_SIZE),
+    .AHB_DATA_WIDTH(`AHB_HDATA_SIZE),
+    .JTAG_BOOT(`JTAG_BOOT)
+  ) ahb_riscv_rom (
+    .clk(core_clk),
+    .rstn(reset_n),
+    // AHB slave signals
+    .hsel_i(ahb_slave[0].HSEL),
+    .haddr_i(ahb_slave[0].HADDR),
+    .hwdata_i(ahb_slave[0].HWDATA),
+    .hwrite_i(ahb_slave[0].HWRITE),
+    .hsize_i(ahb_slave[0].HSIZE),
+    .hburst_i(ahb_slave[0].HBURST),
+    .hprot_i(ahb_slave[0].HPROT),
+    .htrans_i(ahb_slave[0].HTRANS),
+    .hmastlock_i(ahb_slave[0].HMASTLOCK),
+    .hready_i(ahb_slave[0].HREADY),
+    .hrdata_o(ahb_slave[0].HRDATA),
+    .hreadyout_o(ahb_slave[0].HREADYOUT),
+    .hresp_o(ahb_slave[0].HRESP)
   );
 
-  ahb3lite_sram1rw #(
-    .MEM_SIZE(0),
-    .MEM_DEPTH(`DRAM_SIZE),
-    .HADDR_SIZE(`AHB_DRAM_ADDR_WIDTH),
-    .HDATA_SIZE(32),
-    .TECHNOLOGY("GENERIC"),
-    .REGISTERED_OUTPUT("NO")
-  ) data_ram (
-    .HRESETn(reset_n),
-    .HCLK(core_clk),
-    .HSEL(ahb_slave[1].HSEL),
-    .HADDR(ahb_slave[1].HADDR),
-    .HWDATA(ahb_slave[1].HWDATA),
-    .HRDATA(ahb_slave[1].HRDATA),
-    .HWRITE(ahb_slave[1].HWRITE),
-    .HSIZE(ahb_slave[1].HSIZE),
-    .HBURST(ahb_slave[1].HBURST),
-    .HPROT(ahb_slave[1].HPROT),
-    .HTRANS(ahb_slave[1].HTRANS),
-    .HREADYOUT(ahb_slave[1].HREADYOUT),
-    .HREADY(ahb_slave[1].HREADY),
-    .HRESP(ahb_slave[1].HRESP)
-  );
-
-  ahb3lite_apb_bridge #(
+  ahb_dummy#(
     .HADDR_SIZE(`AHB_HADDR_SIZE),
-    .HDATA_SIZE(`AHB_HDATA_SIZE),
-    .PADDR_SIZE(`APB_PADDR_SIZE),
-    .PDATA_SIZE(`APB_PDATA_SIZE),
-    .SYNC_DEPTH(3)
-  ) ahb_to_apb (
-    //AHB Slave Interface
+    .HDATA_SIZE(`AHB_HDATA_SIZE)
+  ) printf_verilator (
     .HRESETn(reset_n),
     .HCLK(core_clk),
     .HSEL(ahb_slave[2].HSEL),
@@ -550,29 +445,19 @@ module riscv_soc
     .HBURST(ahb_slave[2].HBURST),
     .HPROT(ahb_slave[2].HPROT),
     .HTRANS(ahb_slave[2].HTRANS),
-    .HMASTLOCK(ahb_slave[2].HMASTLOCK),
     .HREADYOUT(ahb_slave[2].HREADYOUT),
     .HREADY(ahb_slave[2].HREADY),
-    .HRESP(ahb_slave[2].HRESP),
-    //APB Master Interface
-    .PRESETn(reset_n),
-    .PCLK(USE_SAME_CLOCK_CORE_PERIPH ? core_clk : periph_clk),
-    .PSEL(apb_ahb_bridge.PSEL),
-    .PENABLE(apb_ahb_bridge.PENABLE),
-    .PPROT(apb_ahb_bridge.PPROT),
-    .PWRITE(apb_ahb_bridge.PWRITE),
-    .PSTRB(apb_ahb_bridge.PSTRB),
-    .PADDR(apb_ahb_bridge.PADDR),
-    .PWDATA(apb_ahb_bridge.PWDATA),
-    .PRDATA(apb_ahb_bridge.PRDATA),
-    .PREADY(apb_ahb_bridge.PREADY),
-    .PSLVERR(apb_ahb_bridge.PSLVERR)
+    .HRESP(ahb_slave[2].HRESP)
   );
 
-  ahb_dummy#(
-    .HADDR_SIZE(`AHB_HADDR_SIZE),
-    .HDATA_SIZE(`AHB_HDATA_SIZE)
-  ) printf_verilator (
+  ahb3lite_sram1rw #(
+    .MEM_SIZE(0),
+    .MEM_DEPTH(`IRAM_SIZE),               // Need to receive number of words = (KB*1024)/4 bytes
+    .HADDR_SIZE(`AHB_IRAM_ADDR_WIDTH),
+    .HDATA_SIZE(32),
+    .TECHNOLOGY("GENERIC"),
+    .REGISTERED_OUTPUT("NO")
+  ) instr_ram (
     .HRESETn(reset_n),
     .HCLK(core_clk),
     .HSEL(ahb_slave[3].HSEL),
@@ -587,6 +472,68 @@ module riscv_soc
     .HREADYOUT(ahb_slave[3].HREADYOUT),
     .HREADY(ahb_slave[3].HREADY),
     .HRESP(ahb_slave[3].HRESP)
+  );
+
+  ahb3lite_sram1rw #(
+    .MEM_SIZE(0),
+    .MEM_DEPTH(`DRAM_SIZE),
+    .HADDR_SIZE(`AHB_DRAM_ADDR_WIDTH),
+    .HDATA_SIZE(32),
+    .TECHNOLOGY("GENERIC"),
+    .REGISTERED_OUTPUT("NO")
+  ) data_ram (
+    .HRESETn(reset_n),
+    .HCLK(core_clk),
+    .HSEL(ahb_slave[4].HSEL),
+    .HADDR(ahb_slave[4].HADDR),
+    .HWDATA(ahb_slave[4].HWDATA),
+    .HRDATA(ahb_slave[4].HRDATA),
+    .HWRITE(ahb_slave[4].HWRITE),
+    .HSIZE(ahb_slave[4].HSIZE),
+    .HBURST(ahb_slave[4].HBURST),
+    .HPROT(ahb_slave[4].HPROT),
+    .HTRANS(ahb_slave[4].HTRANS),
+    .HREADYOUT(ahb_slave[4].HREADYOUT),
+    .HREADY(ahb_slave[4].HREADY),
+    .HRESP(ahb_slave[4].HRESP)
+  );
+
+  ahb3lite_apb_bridge #(
+    .HADDR_SIZE(`AHB_HADDR_SIZE),
+    .HDATA_SIZE(`AHB_HDATA_SIZE),
+    .PADDR_SIZE(`APB_PADDR_SIZE),
+    .PDATA_SIZE(`APB_PDATA_SIZE),
+    .SYNC_DEPTH(3)
+  ) ahb_to_apb (
+    //AHB Slave Interface
+    .HRESETn(reset_n),
+    .HCLK(core_clk),
+    .HSEL(ahb_slave[5].HSEL),
+    .HADDR(ahb_slave[5].HADDR),
+    .HWDATA(ahb_slave[5].HWDATA),
+    .HRDATA(ahb_slave[5].HRDATA),
+    .HWRITE(ahb_slave[5].HWRITE),
+    .HSIZE(ahb_slave[5].HSIZE),
+    .HBURST(ahb_slave[5].HBURST),
+    .HPROT(ahb_slave[5].HPROT),
+    .HTRANS(ahb_slave[5].HTRANS),
+    .HMASTLOCK(ahb_slave[5].HMASTLOCK),
+    .HREADYOUT(ahb_slave[5].HREADYOUT),
+    .HREADY(ahb_slave[5].HREADY),
+    .HRESP(ahb_slave[5].HRESP),
+    //APB Master Interface
+    .PRESETn(reset_n),
+    .PCLK(USE_SAME_CLOCK_CORE_PERIPH ? core_clk : periph_clk),
+    .PSEL(apb_ahb_bridge.PSEL),
+    .PENABLE(apb_ahb_bridge.PENABLE),
+    .PPROT(apb_ahb_bridge.PPROT),
+    .PWRITE(apb_ahb_bridge.PWRITE),
+    .PSTRB(apb_ahb_bridge.PSTRB),
+    .PADDR(apb_ahb_bridge.PADDR),
+    .PWDATA(apb_ahb_bridge.PWDATA),
+    .PRDATA(apb_ahb_bridge.PRDATA),
+    .PREADY(apb_ahb_bridge.PREADY),
+    .PSLVERR(apb_ahb_bridge.PSLVERR)
   );
 
   apb_mux #(
@@ -621,12 +568,12 @@ module riscv_soc
   endgenerate
 
   apb_gpio #(
-    .APB_ADDR_WIDTH(12)
+    .APB_ADDR_WIDTH(`APB_ADDR_WIDTH)
   ) gpio_0 (
     .HCLK(USE_SAME_CLOCK_CORE_PERIPH ? core_clk : periph_clk),
     .HRESETn(reset_n),
     .dft_cg_enable_i(1'b0),
-    .PADDR(apb_ahb_bridge.PADDR[11:0]),
+    .PADDR(apb_ahb_bridge.PADDR[`APB_ADDR_WIDTH-1:0]),
     .PWDATA(apb_ahb_bridge.PWDATA),
     .PWRITE(apb_ahb_bridge.PWRITE),
     .PSEL(apb_slaves[0].PSEL),
@@ -634,36 +581,13 @@ module riscv_soc
     .PRDATA(apb_slaves[0].PRDATA),
     .PREADY(apb_slaves[0].PREADY),
     .PSLVERR(apb_slaves[0].PSLVERR),
-    .gpio_in('0),
+    .gpio_in(gpio_in),
     .gpio_in_sync(),
     .gpio_out(gpio_out),
     .gpio_dir(),
     .gpio_padcfg(),
     .interrupt()
   );
-
-  apb_gpio #(
-    .APB_ADDR_WIDTH(12)
-  ) gpio_1 (
-    .HCLK(USE_SAME_CLOCK_CORE_PERIPH ? core_clk : periph_clk),
-    .HRESETn(reset_n),
-    .dft_cg_enable_i(1'b0),
-    .PADDR(apb_ahb_bridge.PADDR[11:0]),
-    .PWDATA(apb_ahb_bridge.PWDATA),
-    .PWRITE(apb_ahb_bridge.PWRITE),
-    .PSEL(apb_slaves[1].PSEL),
-    .PENABLE(apb_ahb_bridge.PENABLE),
-    .PRDATA(apb_slaves[1].PRDATA),
-    .PREADY(apb_slaves[1].PREADY),
-    .PSLVERR(apb_slaves[1].PSLVERR),
-    .gpio_in(gpio_in),
-    .gpio_in_sync(),
-    .gpio_out(),
-    .gpio_dir(),
-    .gpio_padcfg(),
-    .interrupt()
-  );
-
 `ifdef VERILATOR
   function [7:0] getbufferReq;
     /* verilator public */
@@ -675,7 +599,7 @@ module riscv_soc
   function printfbufferReq;
     /* verilator public */
     begin
-      printfbufferReq = ((ahb_master[1].HADDR == 32'h2000_0000) && ahb_master[1].HWRITE);
+      printfbufferReq = ((ahb_master[1].HADDR == 32'h1C00_0000) && ahb_master[1].HWRITE);
     end
   endfunction
 

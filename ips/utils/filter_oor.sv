@@ -7,18 +7,20 @@ module filter_oor (
   output  error_o
 );
   logic enable_valid;
+  logic [`AHB_SLAVES_NUM-1:0] en_addr;
 
-  assign valid_o = enable_valid ? '1 : '0;
+  assign valid_o = enable_valid ? input_sel_i : '0;
   assign error_o = input_sel_i && ~enable_valid;
 
+  genvar i;
+  generate
+    for (i=0; i < `AHB_SLAVES_NUM; i++) begin
+      assign en_addr[i] = (addr_i >= ahb_addr[0][i] && addr_i <= ahb_addr[1][i]) ? 1'b1 : 1'b0;
+    end
+  endgenerate
+
   always @ (*) begin
-    if (input_sel_i &&
-        (addr_i >= `AHB_SL_BASE_ADDR_0 && addr_i <= (`AHB_SL_BASE_ADDR_0 + ~(`AHB_SL_MASK_ADDR_0))) ||
-        (addr_i >= `AHB_SL_BASE_ADDR_1 && addr_i <= (`AHB_SL_BASE_ADDR_1 + ~(`AHB_SL_MASK_ADDR_1))) ||
-        (addr_i >= `AHB_SL_BASE_ADDR_2 && addr_i <= (`AHB_SL_BASE_ADDR_2 + ~(`AHB_SL_MASK_ADDR_2))) ||
-        (addr_i >= `AHB_SL_BASE_ADDR_3 && addr_i <= (`AHB_SL_BASE_ADDR_3 + ~(`AHB_SL_MASK_ADDR_3))) ||
-        (addr_i >= `AHB_SL_BASE_ADDR_4 && addr_i <= (`AHB_SL_BASE_ADDR_4 + ~(`AHB_SL_MASK_ADDR_4))) ||
-        (addr_i >= `AHB_SL_BASE_ADDR_5 && addr_i <= (`AHB_SL_BASE_ADDR_5 + ~(`AHB_SL_MASK_ADDR_5)))) begin
+    if (input_sel_i && |en_addr) begin
       enable_valid = 1;
     end
     else begin
@@ -26,3 +28,4 @@ module filter_oor (
     end
   end
 endmodule
+

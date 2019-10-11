@@ -142,7 +142,7 @@ bool loadELF(testbench<Vriscv_soc> *cpu, const char *program_path, const bool en
             return false;
         }
 
-        if (lma_addr >= 0xA0000000 && lma_addr < 0xB0000000){
+        if (lma_addr >= 0x20000000 && lma_addr <0x30000000){
             // IRAM Address
             if (en_print) printf("\nIRAM address space");
             for (uint32_t p = 0; p < mem_size; p+=4){
@@ -205,12 +205,12 @@ int main(int argc, char** argv, char** env){
 
     if (JTAG_BOOT){
         rbb->accept_client();
-        soc->core->boot_addr_i = 0x1A000080;
+        soc->core->boot_addr_i = 0x1A000000;
     }
     else
         if (!loadELF(soc, argv[1], true)) exit(1);
 
-    soc->reset_n(2);
+    soc->reset_n(1);
     soc->core->fetch_enable_i = 1;
 
     struct sigaction sigIntHandler;

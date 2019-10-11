@@ -28,8 +28,8 @@ ENTRY( _start )
 
 MEMORY
 {
-  IRAM(rxai!w) : ORIGIN = 0xA0000000, LENGTH = 32K
-  DRAM(wxa!ri) : ORIGIN = 0xB0000000, LENGTH = 32K
+  IRAM(rxai!w) : ORIGIN = 0x20000000, LENGTH = 32K
+  DRAM(wxa!ri) : ORIGIN = 0x30000000, LENGTH = 32K
 }
 
 _stack_size = 0x2000; /* 8k */

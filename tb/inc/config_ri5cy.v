@@ -18,7 +18,7 @@
   `define APU_WOP_CPU         6
   `define APU_NDSFLAGS_CPU    15
   `define APU_NUSFLAGS_CPU    5
-  `define DM_HaltAddress      32'h1A110800
+  `define DM_HaltAddress      32'h1B00_0800
   `define CORE_ID             4'd0
   `define CLUSTER_ID          6'd0
   `define CORE_MHARTID        {`CLUSTER_ID, 1'b0, `CORE_ID}
