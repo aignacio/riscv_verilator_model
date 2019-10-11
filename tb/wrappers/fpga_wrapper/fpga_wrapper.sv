@@ -8,14 +8,21 @@ module artix_wrapper (
   input   jtag_tms,
   input   jtag_tdi,
   output  jtag_tdo,
-  input   jtag_trstn,
   // Peripherals
   output  [11:0] gpio_out,
-  input   [3:0] gpio_in
+  input   [3:0] gpio_in,
+  // Status
+  output  [3:0] led
 );
   logic core_clk;
   logic periph_clk;
+  logic status_clk;
   logic fetch_enable;
+
+  assign led[0] = status_clk;
+  assign led[1] = status_clk;
+  assign led[2] = status_clk;
+  assign led[3] = status_clk;
 
   mmcm clk_mmcm (
     // Clock in ports
@@ -23,6 +30,7 @@ module artix_wrapper (
     // Clock out ports
     .core_clk(core_clk),
     .periph_clk(periph_clk),
+    .status_clk(status_clk),
     // Status and control signals
     .resetn(reset_n),
     .locked(fetch_enable)
@@ -42,6 +50,6 @@ module artix_wrapper (
     .jtag_tms(jtag_tms),
     .jtag_tdi(jtag_tdi),
     .jtag_tdo(jtag_tdo),
-    .jtag_trstn(jtag_trstn)
+    .jtag_trstn(reset_n)
   );
 endmodule

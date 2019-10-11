@@ -31,7 +31,7 @@ else ifeq ($(FPGA_BOARD),artix_a100)
 	HW_PART				:=	xc7a100t_0
 	MEM_PART			:=	s25fl128sxxxxxx0-spi-x1_x2_x4
 else ifeq ($(FPGA_BOARD),pynq)
-	XILINX_BOARD	:=	digilentinc.com:PYNQ-Z1:part0:1.0
+	XILINX_BOARD	:=	www.digilentinc.com:pynq-z1:part0:1.0
 	XILINX_PART		:=	xc7z020clg400-1
 	XILINX_TARGET	:=	arty
 	HW_PART				:=	xc7a100t_0
@@ -269,7 +269,6 @@ verilator: $(VERILATOR_EXE)
 	@echo "\n"
 
 $(VERILATOR_EXE): $(OUT_VERILATOR)/V$(ROOT_MOD_VERI).mk
-	@echo "Building with max. threads: $(MAX_THREAD)"
 	+@make -C $(OUT_VERILATOR) -f V$(ROOT_MOD_VERI).mk
 
 $(OUT_VERILATOR)/V$(ROOT_MOD_VERI).mk: $(SRC_VERILOG) $(SRC_CPP) $(TB_VERILATOR)

@@ -4,4 +4,4 @@ set_property BITSTREAM.CONFIG.SPI_BUSWIDTH 4 [current_design]
 set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets jtag_tck]
 
 ## Clock signal
-create_clock -add -name sys_clk_pin -period 8.00 -waveform {0 4} [get_ports { clk_sys }];
+create_clock -add -name sys_clk_pin -period 8.00 -waveform {0.000 4.000} [get_ports { clk_sys }];
