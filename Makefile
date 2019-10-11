@@ -9,9 +9,11 @@ IPS_FOLDER		:=	ips
 # Define here the size of the RAMs once it need to check if the program fits
 IRAM_KB_SIZE	:=	32
 DRAM_KB_SIZE	:=	32
-JTAG_BOOT			:=	1
+JTAG_BOOT			?=	0
+JTAG_PORT			?=	8080
+MAX_THREAD		?=	$(shell nproc --all)
 ##### FPGA makefile variables
-FPGA_BOARD		:=	artix_a35
+FPGA_BOARD		:=	pynq
 CPU_CORES			:=	8
 FPGA_WRAPPER	:=	artix_wrapper
 SYNTH_MODE		:=	none
@@ -57,7 +59,6 @@ TEST_PROG			:=	hello_world
 TB_VERILATOR	:=	$(VERILATOR_TB)/cpp/testbench.cpp
 
 DEPEND	   		:=	git				\
-									iverilog	\
 									gtkwave 	\
 									verilator
 
@@ -183,7 +184,7 @@ VERIL_FLAGS		:=	-O3 										\
 									-Wno-BLKANDNBLK					\
 									-Wno-CMPCONST						\
 									--exe										\
-									--threads	4							\
+									--threads	$(MAX_THREAD)	\
 									--trace 								\
 									--trace-depth			1000	\
 									--trace-max-array	1000	\
@@ -194,7 +195,8 @@ CPPFLAGS_VERI	:=	"$(INCS_CPP) -O3 -g3 -Wall 						\
 									-DWAVEFORM_VCD=\"$(WAVEFORM_VCD)\" 		\
 									-DIRAM_KB_SIZE=\"$(IRAM_KB_SIZE)\"		\
 									-DDRAM_KB_SIZE=\"$(DRAM_KB_SIZE)\"		\
-									-DJTAG_BOOT=\"$(JTAG_BOOT)\""
+									-DJTAG_BOOT=\"$(JTAG_BOOT)\"					\
+									-DJTAG_PORT=\"$(JTAG_PORT)\""
 # WARN: rtls order matters in verilator compilation seq.
 VERIL_ARGS		:=	-CFLAGS $(CPPFLAGS_VERI) 			\
 									--top-module $(ROOT_MOD_VERI) \
@@ -251,7 +253,7 @@ program_mcs:
 	+@make -C fpga $@
 
 openocd_fpga:
-	riscv-openocd -f tb/debug/esp-prog.cfg -f tb/debug/riscv_pulp_fpga.cfg
+	riscv-openocd -f tb/debug/bus-pirate.cfg -f tb/debug/riscv_pulp_fpga.cfg
 
 ####################### verilator simulation rules #######################
 wave:
@@ -267,6 +269,7 @@ verilator: $(VERILATOR_EXE)
 	@echo "\n"
 
 $(VERILATOR_EXE): $(OUT_VERILATOR)/V$(ROOT_MOD_VERI).mk
+	@echo "Building with max. threads: $(MAX_THREAD)"
 	+@make -C $(OUT_VERILATOR) -f V$(ROOT_MOD_VERI).mk
 
 $(OUT_VERILATOR)/V$(ROOT_MOD_VERI).mk: $(SRC_VERILOG) $(SRC_CPP) $(TB_VERILATOR)

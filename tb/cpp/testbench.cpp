@@ -175,7 +175,7 @@ bool loadELF(testbench<Vriscv_soc> *cpu, const char *program_path, const bool en
 int main(int argc, char** argv, char** env){
     Verilated::commandArgs(argc, argv);
 
-    auto *rbb = new jtag_rbb(8080);
+    auto *rbb = new jtag_rbb(JTAG_PORT);
     auto *soc = new testbench<Vriscv_soc>;
     int test = 50;
     unsigned char srst_pin;

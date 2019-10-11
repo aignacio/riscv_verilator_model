@@ -156,7 +156,7 @@ void jtag_rbb::read_cmd(bool block_or_nonblocking){
 void jtag_rbb::accept_client(){
     int again = 1;
 
-    printf("\nWaiting for connection from OpenOCD tcp:%d\n",port_value);
+    printf("\nWaiting for connection from OpenOCD RBB tcp:%d\n",port_value);
 
     while (again != 0) {
         client_sck = accept(server_fd, NULL, NULL);
