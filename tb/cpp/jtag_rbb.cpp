@@ -51,8 +51,8 @@ jtag_rbb::jtag_rbb (int portnum){
         abort();
     }
 
-    // Blocking method to wait for client connection
-    this->accept_client();
+    // // Blocking method to wait for client connection
+    // this->accept_client();
 }
 
 void jtag_rbb::reset(char trst, char srst){
@@ -76,7 +76,6 @@ void jtag_rbb::read_cmd(bool block_or_nonblocking){
     char tosend = '?';
     int dosend = 0;
     int again = 1;
-    int quit = 0;
 
     // Non-blocking read
     if (block_or_nonblocking == true) {

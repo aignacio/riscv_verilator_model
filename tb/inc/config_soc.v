@@ -9,7 +9,7 @@
   `define AHB_SLAVES_NUM      6  // Number of slaves AHB
   `define AHB_HADDR_SIZE      32 // bit-width AHB address haddr
   `define AHB_HDATA_SIZE      32 // bit-width AHB data
-  `define AHB_SL_BASE_ADDR_0  32'h1C00_0000 // IRAM Base address 1C00_0000
+  `define AHB_SL_BASE_ADDR_0  32'hA000_0000 // IRAM Base address 1C00_0000
   `define AHB_SL_MASK_ADDR_0  32'hFF00_0000 // Final address 1CFF_FFFF
   `define AHB_SL_BASE_ADDR_1  32'hB000_0000
   `define AHB_SL_MASK_ADDR_1  32'hF000_0000 // To define the mask  -->  mask = ~(FINAL ADDRESS - BASE ADDRESS)

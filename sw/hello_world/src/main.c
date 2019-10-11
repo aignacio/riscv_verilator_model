@@ -29,12 +29,12 @@ int main(void) {
     //     set_gpio_pin_direction(i,DIR_OUT);
 
     while(1){
-        for (int i = 0;i<32;i++)
-            set_gpio_pin_value(i,toggle);
+        // for (int i = 0;i<32;i++)
+            // set_gpio_pin_value(i,toggle);
 
-        toggle = !toggle;
+        // toggle = !toggle;
 
-        for (int i=0;i<1000000;i++);
-        // printf("\nHello World... %d %p %x", test++, &test, test);
+        // for (int i=0;i<1000000;i++);
+        printf("\nHello World... %d %p %x", test++, &test, test);
     };
 }

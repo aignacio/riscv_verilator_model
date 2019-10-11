@@ -2,6 +2,7 @@
 #include <fstream>
 #include <string>
 #include <stdlib.h>
+#include <signal.h>
 
 #include "jtag_rbb.hpp"
 #include "elfio/elfio/elfio.hpp"
@@ -14,6 +15,11 @@
 #define STRINGIZE_VALUE_OF(x) STRINGIZE(x)
 
 using namespace std;
+
+void goingout(int s){
+    printf("Caught signal %d\n",s);
+    exit(1);
+}
 
 template<class module> class testbench {
 	VerilatedVcdC *trace = new VerilatedVcdC;
@@ -174,14 +180,14 @@ bool loadELF(testbench<Vriscv_soc> *cpu, const char *program_path, const bool en
 
 int main(int argc, char** argv, char** env){
     Verilated::commandArgs(argc, argv);
-
     auto *rbb = new jtag_rbb(JTAG_PORT);
-    auto *soc = new testbench<Vriscv_soc>;
-    int test = 50;
     unsigned char srst_pin;
     unsigned char trst_pin;
+    auto *soc = new testbench<Vriscv_soc>;
+    int test = 50;
 
-    // soc->opentrace(STRINGIZE_VALUE_OF(WAVEFORM_VCD));
+    if (EN_VCD)
+        soc->opentrace(STRINGIZE_VALUE_OF(WAVEFORM_VCD));
 
     rbb->tck_pin   = &soc->core->jtag_tck;
     rbb->tms_pin   = &soc->core->jtag_tms;
@@ -192,20 +198,30 @@ int main(int argc, char** argv, char** env){
     rbb->trstn_pin = &soc->core->jtag_trstn;
 
     cout << "\n[RISCV SoC] Emulator started";
-    cout << "\n[VCD File] " << STRINGIZE_VALUE_OF(WAVEFORM_VCD);
+    if (EN_VCD)
+        cout << "\n[VCD File] " << STRINGIZE_VALUE_OF(WAVEFORM_VCD);
     cout << "\n[IRAM KB Size] " << STRINGIZE_VALUE_OF(IRAM_KB_SIZE) << "KB";
     cout << "\n[DRAM KB Size] " << STRINGIZE_VALUE_OF(DRAM_KB_SIZE) << "KB \n";
 
-    if (JTAG_BOOT)
+    if (JTAG_BOOT){
+        rbb->accept_client();
         soc->core->boot_addr_i = 0x1A000080;
+    }
     else
         if (!loadELF(soc, argv[1], true)) exit(1);
 
     soc->reset_n(2);
     soc->core->fetch_enable_i = 1;
 
-    while(true) {
-        rbb->read_cmd(false);
+    struct sigaction sigIntHandler;
+    sigIntHandler.sa_handler = goingout;
+    sigemptyset(&sigIntHandler.sa_mask);
+    sigIntHandler.sa_flags = 0;
+    sigaction(SIGINT, &sigIntHandler, NULL);
+
+    while(JTAG_BOOT ? ~rbb->quit : true) {
+        if (JTAG_BOOT)
+            rbb->read_cmd(false);
 		soc->tick();
 	}
     soc->close();

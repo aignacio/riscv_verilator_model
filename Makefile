@@ -1,11 +1,13 @@
 # SHELL := /bin/bash
 RISCV_TOOLCHAIN ?=	riscv-none-embed
 export RISCV_TOOLCHAIN
-
+SSH_KEY				:=	$$(cat ~/.ssh/id_rsa)
+SSH_KEY_PUB		:=	$$(cat ~/.ssh/id_rsa.pub)
 ##### Project variables
 PROJECT_NAME	:=	riscv
 VERILATOR_TB	:=	tb
 IPS_FOLDER		:=	ips
+EN_VCD				?=	0
 # Define here the size of the RAMs once it need to check if the program fits
 IRAM_KB_SIZE	:=	32
 DRAM_KB_SIZE	:=	32
@@ -196,7 +198,8 @@ CPPFLAGS_VERI	:=	"$(INCS_CPP) -O3 -g3 -Wall 						\
 									-DIRAM_KB_SIZE=\"$(IRAM_KB_SIZE)\"		\
 									-DDRAM_KB_SIZE=\"$(DRAM_KB_SIZE)\"		\
 									-DJTAG_BOOT=\"$(JTAG_BOOT)\"					\
-									-DJTAG_PORT=\"$(JTAG_PORT)\""
+									-DJTAG_PORT=\"$(JTAG_PORT)\"					\
+									-DEN_VCD=\"$(EN_VCD)\""
 # WARN: rtls order matters in verilator compilation seq.
 VERIL_ARGS		:=	-CFLAGS $(CPPFLAGS_VERI) 			\
 									--top-module $(ROOT_MOD_VERI) \
@@ -226,18 +229,20 @@ export MEM_PART
 ########################################################################
 ###################### DO NOT EDIT ANYTHING BELOW ######################
 ########################################################################
-.PHONY: all clean check install \
-				verilator clean sw run
-
+.PHONY: all help
 help:
 	@echo "Rules list:"
-	@echo "all		- run verilator_sim"
+	@echo "all		- build riscv_soc without enabling JTAG"
+	@echo "run		- exec. verilator loading from elf file NO JTAG"
 	@echo "wave		- open gtkwave with waveform vcd dump"
 	@echo "fpga		- synthetize riscv_soc throught vivado for fpga targets"
-	@echo "clean		- clean verilator output builds"
+	@echo "clean		- clean verilator/fpga output builds"
 	@echo "check		- check dependencies for running the project"
 	@echo "install		- install dependencies through apt-get"
-	@echo "verilator	- compile/run a complete SoC through verilator in C++"
+	@echo "docker		- build docker image with verilator + jtag"
+	@echo "openocd		- run openocd to connect with verilator RBB"
+	@echo "openocd_fpga	- run openocd to connect with fpga"
+	@echo "gdb		- run gdb to connect to the target and load"
 
 all: verilator
 
@@ -256,6 +261,7 @@ openocd_fpga:
 	riscv-openocd -f tb/debug/bus-pirate.cfg -f tb/debug/riscv_pulp_fpga.cfg
 
 ####################### verilator simulation rules #######################
+.PHONY: wave run verilator sw openocd gdb clean
 wave:
 	gtkwave -go $(WAVEFORM_VCD) $(WAVEFORM_VERI)
 
@@ -280,7 +286,7 @@ sw:
 openocd:
 	riscv-openocd -f tb/debug/riscv_pulp.cfg
 
-gdb:
+gdb: sw
 	$(RISCV_TOOLCHAIN)-gdb sw/$(TEST_PROG)/output/$(TEST_PROG).elf -ex "target remote : 3333" -ex "load"
 
 clean:
@@ -291,6 +297,7 @@ clean:
 	+@make -C fpga clean
 
 ####################### check for dependencies #######################
+.PHONY: setup check install docker rundocker
 setup: check
 	$(call print_logo)
 
@@ -300,6 +307,11 @@ check:
 install:
 	$(foreach program,$(DEPEND),$(call install_program,$(program)))
 
+docker:
+	docker build -t riscv_model --build-arg ssh_prv_key="$(SSH_KEY)" --build-arg ssh_pub_key="$(SSH_KEY_PUB)" dockerfile
+
+rundocker:
+	docker run -p 8080:8080 riscv_model:latest
 ####################### functions #######################
 define check_program
 	$(info Checking program [$(1)]...)

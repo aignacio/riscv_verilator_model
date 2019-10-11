@@ -1,14 +1,14 @@
 [*]
 [*] GTKWave Analyzer v3.3.98 (w)1999-2019 BSI
-[*] Mon Oct  7 13:21:27 2019
+[*] Fri Oct 11 13:30:31 2019
 [*]
-[dumpfile] "/tmp/riscv_mode.vcd"
-[dumpfile_mtime] "Mon Oct  7 13:20:03 2019"
-[dumpfile_size] 1861351864
+[dumpfile] "/tmp/riscv_soc.vcd"
+[dumpfile_mtime] "Fri Oct 11 13:20:22 2019"
+[dumpfile_size] 16141511
 [optimize_vcd]
-[savefile] "/home/aignacio/projects/riscv_model/tb/waveform_template/gtkwave_tmpl.gtkw"
-[timestart] 614471
-[size] 2560 1376
+[savefile] "/home/aignacio/projects/riscv_verilator_model/tb/waveform_template/gtkwave_tmpl.gtkw"
+[timestart] 1
+[size] 1920 1016
 [pos] 1920 27
 *-2.390983 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TOP.
@@ -16,6 +16,7 @@
 [treeopen] TOP.riscv_soc.data_ram.ram_inst.
 [treeopen] TOP.riscv_soc.data_ram.ram_inst.genblk2.
 [treeopen] TOP.riscv_soc.data_ram.ram_inst.genblk2.genblk2.
+[treeopen] TOP.riscv_soc.instr_ram.
 [treeopen] TOP.riscv_soc.instr_ram.ram_inst.
 [treeopen] TOP.riscv_soc.instr_ram.ram_inst.genblk2.
 [treeopen] TOP.riscv_soc.instr_ram.ram_inst.genblk2.genblk2.
@@ -26,12 +27,11 @@
 [sst_width] 228
 [signals_width] 268
 [sst_expanded] 1
-[sst_vpaned_height] 672
+[sst_vpaned_height] 420
 @28
 TOP.riscv_soc.dm_debug_req[0]
 TOP.riscv_soc.ndmreset_n
 TOP.riscv_soc.reset_n
-TOP.riscv_soc.clk
 @22
 TOP.riscv_soc.riscv_cpu.boot_addr_i[31:0]
 @800200
@@ -51,7 +51,7 @@ TOP.riscv_soc.riscv_cpu.instr_hresp_i
 [color] 2
 TOP.riscv_soc.riscv_cpu.instr_hsel_o
 @2024
-^1 /home/aignacio/projects/riscv_model/tb/waveform_template/ahb_size.tmpl
+^1 /home/aignacio/projects/riscv_verilator_model/tb/waveform_template/ahb_size.tmpl
 TOP.riscv_soc.riscv_cpu.instr_hsize_o[2:0]
 @28
 TOP.riscv_soc.riscv_cpu.instr_htrans_o[1:0]
@@ -78,7 +78,7 @@ TOP.riscv_soc.riscv_cpu.data_hresp_i
 [color] 2
 TOP.riscv_soc.riscv_cpu.data_hsel_o
 @2024
-^1 /home/aignacio/projects/riscv_model/tb/waveform_template/ahb_size.tmpl
+^1 /home/aignacio/projects/riscv_verilator_model/tb/waveform_template/ahb_size.tmpl
 TOP.riscv_soc.riscv_cpu.data_hsize_o[2:0]
 @28
 TOP.riscv_soc.riscv_cpu.data_htrans_o[1:0]
@@ -88,122 +88,7 @@ TOP.riscv_soc.riscv_cpu.data_hwdata_o[31:0]
 TOP.riscv_soc.riscv_cpu.data_hwrite_o
 @1000200
 -data_ahb
-@c00200
--jtag
-@28
-TOP.riscv_soc.reset_n
-TOP.riscv_soc.ndmreset_n
-TOP.riscv_soc.sim_jtag_tck
-TOP.riscv_soc.sim_jtag_tdi
-TOP.riscv_soc.sim_jtag_tdo
-TOP.riscv_soc.sim_jtag_tms
-TOP.riscv_soc.sim_jtag_trstn
-@1401200
--jtag
-@800200
--sb
-@28
-TOP.riscv_soc.sb_req
 @22
-TOP.riscv_soc.sb_addr[31:0]
-TOP.riscv_soc.sb_be[3:0]
-@28
-TOP.riscv_soc.sb_gnt
-@22
-TOP.riscv_soc.sb_rdata[31:0]
-@28
-TOP.riscv_soc.sb_rvalid
-@22
-TOP.riscv_soc.sb_wdata[31:0]
-@28
-TOP.riscv_soc.sb_we
-@1000200
--sb
-@800200
--dm
-@28
-TOP.riscv_soc.dm_req
-@22
-TOP.riscv_soc.dm_addr[31:0]
-TOP.riscv_soc.dm_be[3:0]
-TOP.riscv_soc.dm_rdata[31:0]
-@28
-TOP.riscv_soc.dm_rvalid
-@22
-TOP.riscv_soc.dm_wdata[31:0]
-@28
-TOP.riscv_soc.dm_we
-@1000200
--dm
-@28
-TOP.riscv_soc.riscv_cpu.riscv_core_i.instr_req_o
-@22
-TOP.riscv_soc.riscv_cpu.riscv_core_i.instr_rdata_i[31:0]
-@28
-TOP.riscv_soc.riscv_cpu.riscv_core_i.instr_gnt_i
-@22
-[color] 2
-TOP.riscv_soc.riscv_cpu.riscv_core_i.id_stage_i.pc_id_i[31:0]
-[color] 2
-TOP.riscv_soc.riscv_cpu.riscv_core_i.id_stage_i.instr[31:0]
-@800200
--dm_ahb
-@28
-TOP.riscv_soc.ahb_slave_debug_unit.lock
-@24
-TOP.riscv_soc.ahb_slave_debug_unit.fsm_st[2:0]
-@22
-TOP.riscv_soc.ahb_slave_debug_unit.haddr_i[31:0]
-@28
-TOP.riscv_soc.ahb_slave_debug_unit.hreadyout_o
-TOP.riscv_soc.ahb_slave_debug_unit.hready_i
-TOP.riscv_soc.ahb_slave_debug_unit.hsel_i
-TOP.riscv_soc.ahb_slave_debug_unit.hsize_i[2:0]
-@22
-TOP.riscv_soc.ahb_slave_debug_unit.hwdata_i[31:0]
-TOP.riscv_soc.ahb_slave_debug_unit.hrdata_o[31:0]
-@28
-TOP.riscv_soc.ahb_slave_debug_unit.hwrite_i
-@1000200
--dm_ahb
-@800200
--rb
-@22
-TOP.riscv_soc.riscv_cpu.riscv_core_i.id_stage_i.registers_i.riscv_register_file_i.mem(0)[31:0]
-@23
-TOP.riscv_soc.riscv_cpu.riscv_core_i.id_stage_i.registers_i.riscv_register_file_i.mem(1)[31:0]
-@22
-TOP.riscv_soc.riscv_cpu.riscv_core_i.id_stage_i.registers_i.riscv_register_file_i.mem(2)[31:0]
-TOP.riscv_soc.riscv_cpu.riscv_core_i.id_stage_i.registers_i.riscv_register_file_i.mem(3)[31:0]
-TOP.riscv_soc.riscv_cpu.riscv_core_i.id_stage_i.registers_i.riscv_register_file_i.mem(4)[31:0]
-TOP.riscv_soc.riscv_cpu.riscv_core_i.id_stage_i.registers_i.riscv_register_file_i.mem(5)[31:0]
-TOP.riscv_soc.riscv_cpu.riscv_core_i.id_stage_i.registers_i.riscv_register_file_i.mem(6)[31:0]
-TOP.riscv_soc.riscv_cpu.riscv_core_i.id_stage_i.registers_i.riscv_register_file_i.mem(7)[31:0]
-TOP.riscv_soc.riscv_cpu.riscv_core_i.id_stage_i.registers_i.riscv_register_file_i.mem(8)[31:0]
-TOP.riscv_soc.riscv_cpu.riscv_core_i.id_stage_i.registers_i.riscv_register_file_i.mem(9)[31:0]
-TOP.riscv_soc.riscv_cpu.riscv_core_i.id_stage_i.registers_i.riscv_register_file_i.mem(10)[31:0]
-TOP.riscv_soc.riscv_cpu.riscv_core_i.id_stage_i.registers_i.riscv_register_file_i.mem(11)[31:0]
-TOP.riscv_soc.riscv_cpu.riscv_core_i.id_stage_i.registers_i.riscv_register_file_i.mem(12)[31:0]
-TOP.riscv_soc.riscv_cpu.riscv_core_i.id_stage_i.registers_i.riscv_register_file_i.mem(13)[31:0]
-TOP.riscv_soc.riscv_cpu.riscv_core_i.id_stage_i.registers_i.riscv_register_file_i.mem(14)[31:0]
-TOP.riscv_soc.riscv_cpu.riscv_core_i.id_stage_i.registers_i.riscv_register_file_i.mem(15)[31:0]
-TOP.riscv_soc.riscv_cpu.riscv_core_i.id_stage_i.registers_i.riscv_register_file_i.mem(16)[31:0]
-TOP.riscv_soc.riscv_cpu.riscv_core_i.id_stage_i.registers_i.riscv_register_file_i.mem(17)[31:0]
-TOP.riscv_soc.riscv_cpu.riscv_core_i.id_stage_i.registers_i.riscv_register_file_i.mem(18)[31:0]
-TOP.riscv_soc.riscv_cpu.riscv_core_i.id_stage_i.registers_i.riscv_register_file_i.mem(19)[31:0]
-TOP.riscv_soc.riscv_cpu.riscv_core_i.id_stage_i.registers_i.riscv_register_file_i.mem(20)[31:0]
-TOP.riscv_soc.riscv_cpu.riscv_core_i.id_stage_i.registers_i.riscv_register_file_i.mem(21)[31:0]
-TOP.riscv_soc.riscv_cpu.riscv_core_i.id_stage_i.registers_i.riscv_register_file_i.mem(22)[31:0]
-TOP.riscv_soc.riscv_cpu.riscv_core_i.id_stage_i.registers_i.riscv_register_file_i.mem(23)[31:0]
-TOP.riscv_soc.riscv_cpu.riscv_core_i.id_stage_i.registers_i.riscv_register_file_i.mem(24)[31:0]
-TOP.riscv_soc.riscv_cpu.riscv_core_i.id_stage_i.registers_i.riscv_register_file_i.mem(25)[31:0]
-TOP.riscv_soc.riscv_cpu.riscv_core_i.id_stage_i.registers_i.riscv_register_file_i.mem(26)[31:0]
-TOP.riscv_soc.riscv_cpu.riscv_core_i.id_stage_i.registers_i.riscv_register_file_i.mem(27)[31:0]
-TOP.riscv_soc.riscv_cpu.riscv_core_i.id_stage_i.registers_i.riscv_register_file_i.mem(28)[31:0]
-TOP.riscv_soc.riscv_cpu.riscv_core_i.id_stage_i.registers_i.riscv_register_file_i.mem(29)[31:0]
-TOP.riscv_soc.riscv_cpu.riscv_core_i.id_stage_i.registers_i.riscv_register_file_i.mem(30)[31:0]
-TOP.riscv_soc.riscv_cpu.riscv_core_i.id_stage_i.registers_i.riscv_register_file_i.mem(31)[31:0]
-@1000200
--rb
+TOP.riscv_soc.instr_ram.ram_inst.genblk2.genblk2.ram_inst.dout_o[31:0]
 [pattern_trace] 1
 [pattern_trace] 0
