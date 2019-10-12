@@ -5,7 +5,6 @@ obj
 obj_dir
 output_icarus
 output_verilator
-.vscode
 INCA_libs
 irun.*
 .simvision
