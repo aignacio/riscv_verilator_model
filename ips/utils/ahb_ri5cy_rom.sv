@@ -38,7 +38,7 @@ module ahb_ri5cy_rom # (
   logic [2:0] fsm_st, next_st;
   logic [31:0] rdata;
 
-  assign hrdata_o     = 'h6f; //JTAG_BOOT ? 'h6f : rdata; // Keep looping while(1)
+  assign hrdata_o     = rdata; // Keep looping while(1)
   assign hreadyout_o  = 1'b1;
   assign hresp_o      = 1'b0;
 
@@ -95,11 +95,18 @@ module ahb_ri5cy_rom # (
     endcase
   end
 
-  boot_rom rom (
-    .clk_i(clk),
-    .req_i(req_o),
-    .addr_i(haddr_i[15:0]-'h80),
-    .rdata_o(rdata)
-  );
+  // boot_rom rom (
+  //   .clk_i(clk),
+  //   .req_i(req_o),
+  //   .addr_i(haddr_i[15:0]-'h80),
+  //   .rdata_o(rdata)
+  // );
 
+  boot_rom_generic rom (
+    .rst_n(rstn),
+    .clk(clk),
+    .en(req_o),
+    .raddr_i(haddr_i[15:0]),
+    .dout_o(rdata)
+  );
 endmodule

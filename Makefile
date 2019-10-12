@@ -15,7 +15,7 @@ JTAG_BOOT			?=	0
 JTAG_PORT			?=	8080
 MAX_THREAD		?=	$(shell nproc --all)
 ##### FPGA makefile variables
-FPGA_BOARD		:=	artix_a35
+FPGA_BOARD		?=	artix_a35
 CPU_CORES			:=	8
 FPGA_WRAPPER	:=	artix_wrapper
 SYNTH_MODE		:=	none
@@ -155,6 +155,7 @@ SRC_VERILOG		+=	$(wildcard $(VERILATOR_TB)/wrappers/*.v)
 SRC_VERILOG		+=	$(COMMON_CELLS)
 SRC_VERILOG		+=	$(SRC_FPNEW)
 SRC_VERILOG		+=	$(SRC_RI5CY)
+SRC_VERILOG		+=	sw/boot_rom/output/prog_rom.sv
 INC_VERILOG		:=	$(VERILATOR_TB)/inc								\
 									$(IPS_FOLDER)/riscv/rtl/include		\
 									$(IPS_FOLDER)/common_cells/include
@@ -190,9 +191,9 @@ VERIL_FLAGS		:=	-O3 										\
 									--exe										\
 									--threads	$(MAX_THREAD)	\
 									--trace 								\
-									--trace-depth			1000	\
-									--trace-max-array	1000	\
-									--trace-max-width 1000	\
+									--trace-depth			10000	\
+									--trace-max-array	10000	\
+									--trace-max-width 10000	\
 									--cc
 CPPFLAGS_VERI	:=	"$(INCS_CPP) -O3 -g3 -Wall 						\
 									-Werror -Wno-aligned-new 							\
@@ -237,6 +238,7 @@ help:
 	@echo "all		- build riscv_soc without enabling JTAG"
 	@echo "run		- exec. verilator loading from elf file NO JTAG"
 	@echo "wave		- open gtkwave with waveform vcd dump"
+	@echo "gdb		- run gdb to connect to the target and load"
 	@echo "fpga		- synthetize riscv_soc throught vivado for fpga targets"
 	@echo "clean		- clean verilator/fpga output builds"
 	@echo "check		- check dependencies for running the project"
@@ -244,13 +246,12 @@ help:
 	@echo "docker		- build docker image with verilator + jtag"
 	@echo "openocd		- run openocd to connect with verilator RBB"
 	@echo "openocd_fpga	- run openocd to connect with fpga"
-	@echo "gdb		- run gdb to connect to the target and load"
 
 all: verilator
 
 ####################### FPGA synthesis rules #######################
 .PHONY: openocd_fpga program_mcs mcs fpga
-fpga:
+fpga: $(SRC_VERILOG)
 	+@make -C fpga force
 
 mcs:
@@ -282,6 +283,9 @@ $(VERILATOR_EXE): $(OUT_VERILATOR)/V$(ROOT_MOD_VERI).mk
 $(OUT_VERILATOR)/V$(ROOT_MOD_VERI).mk: $(SRC_VERILOG) $(SRC_CPP) $(TB_VERILATOR)
 	verilator $(VERIL_ARGS)
 
+sw/boot_rom/%.sv:
+	+@make -C sw/boot_rom all
+
 sw:
 	+@make -C sw/$(TEST_PROG) VERILAT=1 all
 
@@ -296,6 +300,7 @@ clean:
 	$(info rm -rf $(OUT_VERILATOR))
 	@rm -rf $(OUT_VERILATOR)
 	+@make -C sw/$(TEST_PROG) clean
+	+@make -C sw/boot_rom clean
 	+@make -C fpga clean
 
 ####################### check for dependencies #######################

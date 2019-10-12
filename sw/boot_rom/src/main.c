@@ -47,7 +47,7 @@ int main(void) {
             for (int i = 0;i<12;i++)
                 set_gpio_pin_value(i,toggle);
 
-            for (int i=0;i<100000;i++);
+            for (int i=0;i<1000000;i++);
             printf("\nHello World... %d %p %x", test, &test, test);
         #endif
     };
