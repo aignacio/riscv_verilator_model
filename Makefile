@@ -72,6 +72,7 @@ SOC_IPS				:=	ahb3lite_pkg							\
 									apb_gpio 									\
 									memory 										\
 									apb4_mux 									\
+									apb_uart_sv								\
 									utils
 
 # RI5CY RTLs files
@@ -185,6 +186,7 @@ VERIL_FLAGS		:=	-O3 										\
 									-Wno-CASEX							\
 									-Wno-BLKANDNBLK					\
 									-Wno-CMPCONST						\
+									-Wno-MODDUP							\
 									--exe										\
 									--threads	$(MAX_THREAD)	\
 									--trace 								\
@@ -270,7 +272,7 @@ run: sw $(VERILATOR_EXE)
 
 verilator: $(VERILATOR_EXE)
 	@echo "\n"
-	@echo "Emulator build, for usage please follow:"
+	@echo "Emulator builded, for usage please follow:"
 	@echo "\033[96m\e[1m./$(VERILATOR_EXE) -h\033[0m"
 	@echo "\n"
 
@@ -281,7 +283,7 @@ $(OUT_VERILATOR)/V$(ROOT_MOD_VERI).mk: $(SRC_VERILOG) $(SRC_CPP) $(TB_VERILATOR)
 	verilator $(VERIL_ARGS)
 
 sw:
-	+@make -C sw/$(TEST_PROG) all
+	+@make -C sw/$(TEST_PROG) VERILAT=1 all
 
 openocd:
 	riscv-openocd -f tb/debug/riscv_pulp.cfg

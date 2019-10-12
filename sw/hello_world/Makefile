@@ -4,6 +4,7 @@ OBJDUMP	:=	$(PREFIX)objdump
 OBJCOPY	:=	$(PREFIX)objcopy
 GDB			:=	$(PREFIX)gdb
 SIZE		:=	$(PREFIX)size
+VERILAT	?=	0
 
 CFLAGS	:=	-march=rv32imc 			\
 						-mabi=ilp32 				\
@@ -29,6 +30,7 @@ ODIR				:=	output
 TEMP				:=	output_temp
 TARGET			:=	$(ODIR)/$(TARGET_NAME)
 LD_SCRIPT		:=	-Tsections.ld
+MACROS			:=	-DVERILATOR=$(VERILAT)
 INC					:=	common
 INC_API			:=	API/inc
 _OBJ    		:=	$(patsubst init/%,%.o,$(basename $(wildcard init/*.S)))
@@ -70,19 +72,19 @@ $(TARGET).elf:	$(OBJ)
 
 $(TEMP)/%.o:	init/%.S
 	@echo "Building $@"
-	$(CC) $(CFLAGS) -save-temps=obj -I$(INC_API) -I$(INC) -c $< -o $@
+	$(CC) $(CFLAGS) -save-temps=obj $(MACROS) -I$(INC_API) -I$(INC) -c $< -o $@
 
 $(TEMP)/%.o:	init/%.c
 	@echo "Building $@"
-	$(CC) $(CFLAGS) -save-temps=obj -I$(INC_API) -I$(INC) -c $< -o $@
+	$(CC) $(CFLAGS) -save-temps=obj $(MACROS) -I$(INC_API) -I$(INC) -c $< -o $@
 
 $(TEMP)/%.o:  src/%.c
 	@echo "Building $@"
-	$(CC) $(CFLAGS) -save-temps=obj -I$(INC_API) -I$(INC) -c $< -o $@
+	$(CC) $(CFLAGS) -save-temps=obj $(MACROS) -I$(INC_API) -I$(INC) -c $< -o $@
 
 $(TEMP)/%.o:  API/src/%.c
 	@echo "Building $@"
-	$(CC) $(CFLAGS) -save-temps=obj -I$(INC_API) -I$(INC) -c $< -o $@
+	$(CC) $(CFLAGS) -save-temps=obj $(MACROS) -I$(INC_API) -I$(INC) -c $< -o $@
 
 debug:
 	@echo "Use disass /m name_of_the_function to search for a function in assembly/c\n"

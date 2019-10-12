@@ -17,14 +17,17 @@ module riscv_soc
   input   reset_n,
   input   [31:0] boot_addr_i,
   input   fetch_enable_i,
-  output  [31:0] gpio_out,
-  input   [31:0] gpio_in,
+  output  [11:0] gpio_out,
+  input   [3:0] gpio_in,
+  input   rx_i,
+  output  tx_o,
   input   jtag_tck,
   input   jtag_tms,
   input   jtag_tdi,
   output  jtag_tdo,
   input   jtag_trstn
 );
+
   /**********************
     AHB WIREUP SIGNALS
   **********************/
@@ -581,12 +584,30 @@ module riscv_soc
     .PRDATA(apb_slaves[0].PRDATA),
     .PREADY(apb_slaves[0].PREADY),
     .PSLVERR(apb_slaves[0].PSLVERR),
-    .gpio_in(gpio_in),
+    .gpio_in({gpio_in,{12{1'b0}}}),
     .gpio_in_sync(),
     .gpio_out(gpio_out),
     .gpio_dir(),
     .gpio_padcfg(),
     .interrupt()
+  );
+
+  apb_uart_sv #(
+    .APB_ADDR_WIDTH(`APB_ADDR_WIDTH)
+  ) apb_uart (
+    .CLK(USE_SAME_CLOCK_CORE_PERIPH ? core_clk : periph_clk),
+    .RSTN(reset_n),
+    .PADDR(apb_ahb_bridge.PADDR[`APB_ADDR_WIDTH-1:0]),
+    .PWDATA(apb_ahb_bridge.PWDATA),
+    .PWRITE(apb_ahb_bridge.PWRITE),
+    .PSEL(apb_slaves[1].PSEL),
+    .PENABLE(apb_ahb_bridge.PENABLE),
+    .PRDATA(apb_slaves[1].PRDATA),
+    .PREADY(apb_slaves[1].PREADY),
+    .PSLVERR(apb_slaves[1].PSLVERR),
+    .rx_i(rx_i),
+    .tx_o(tx_o),
+    .event_o()
   );
 `ifdef VERILATOR
   function [7:0] getbufferReq;

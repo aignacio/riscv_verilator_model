@@ -16,7 +16,13 @@ volatile uint32_t* const printf_buffer = (uint32_t*) PRINTF_VERILATOR;
 size_t _write(int fildes, const void *buf, size_t nbyte) {
     const uint8_t* cbuf = (const uint8_t*) buf;
     for (size_t i = 0; i < nbyte; ++i) {
+    #if VERILATOR == 1
+        #warning "[PLEASE READ] PRINTF output will be redirected to verilator dump peripheral"
         *printf_buffer = cbuf[i];
+    #else
+        #warning "[PLEASE READ] PRINTF output will be redirected to UART peripheral"
+        uart_send((const char *)&cbuf[i],1);
+    #endif
     }
     return nbyte;
 }
@@ -25,16 +31,24 @@ int main(void) {
     int test = 0;
     bool toggle = false;
 
-    for (int i = 0;i<32;i++)
+    for (int i = 0;i<11;i++)
         set_gpio_pin_direction(i,DIR_OUT);
+    for (int i = 12;i<16;i++)
+        set_gpio_pin_direction(i,DIR_IN);
+
+    uart_set_cfg(0, 49);
 
     while(1){
-        for (int i = 0;i<32;i++)
-            set_gpio_pin_value(i,toggle);
+        #if VERILATOR == 1
+            test++;
+            printf("\nHello World... %d %p %x", test, &test, test);
+        #else
+            toggle = !toggle;
+            for (int i = 0;i<12;i++)
+                set_gpio_pin_value(i,toggle);
 
-        toggle = !toggle;
-
-        for (int i=0;i<1000000;i++);
-        // printf("\nHello World... %d %p %x", test++, &test, test);
+            for (int i=0;i<1000000;i++);
+            printf("\nHello World... %d %p %x", test, &test, test);
+        #endif
     };
 }

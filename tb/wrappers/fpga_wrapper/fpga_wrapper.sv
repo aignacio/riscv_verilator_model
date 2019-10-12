@@ -11,18 +11,19 @@ module artix_wrapper (
   // Peripherals
   output  [11:0] gpio_out,
   input   [3:0] gpio_in,
+  input   rx_i,
+  output  tx_o,
   // Status
-  output  [3:0] led
+  output  clk_locked
 );
   logic core_clk;
   logic periph_clk;
   logic status_clk;
+  logic locked;
   logic fetch_enable;
 
-  assign led[0] = status_clk;
-  assign led[1] = status_clk;
-  assign led[2] = status_clk;
-  assign led[3] = status_clk;
+  assign fetch_enable = locked;
+  assign clk_locked = locked;
 
   mmcm clk_mmcm (
     // Clock in ports
@@ -30,10 +31,9 @@ module artix_wrapper (
     // Clock out ports
     .core_clk(core_clk),
     .periph_clk(periph_clk),
-    .status_clk(status_clk),
     // Status and control signals
     .resetn(reset_n),
-    .locked(fetch_enable)
+    .locked(locked)
   );
 
   riscv_soc #(
@@ -46,6 +46,8 @@ module artix_wrapper (
     .fetch_enable_i(fetch_enable),
     .gpio_out(gpio_out),
     .gpio_in(gpio_in),
+    .rx_i(rx_i),
+    .tx_o(tx_o),
     .jtag_tck(jtag_tck),
     .jtag_tms(jtag_tms),
     .jtag_tdi(jtag_tdi),

@@ -34,11 +34,12 @@ set_property -dict {PACKAGE_PIN K2 IOSTANDARD LVCMOS33} [get_ports {gpio_out[2]}
 set_property -dict {PACKAGE_PIN H6 IOSTANDARD LVCMOS33} [get_ports {gpio_out[1]}]
 set_property -dict {PACKAGE_PIN K1 IOSTANDARD LVCMOS33} [get_ports {gpio_out[0]}]
 
-set_property -dict { PACKAGE_PIN H5    IOSTANDARD LVCMOS33 } [get_ports { led[0] }]
-set_property -dict { PACKAGE_PIN J5    IOSTANDARD LVCMOS33 } [get_ports { led[1] }]
-set_property -dict { PACKAGE_PIN T9    IOSTANDARD LVCMOS33 } [get_ports { led[2] }]
-set_property -dict { PACKAGE_PIN T10   IOSTANDARD LVCMOS33 } [get_ports { led[3] }]
+set_property -dict { PACKAGE_PIN H5    IOSTANDARD LVCMOS33 } [get_ports { clk_locked }]
 
 ## USB-UART Interface
-# set_property -dict {PACKAGE_PIN D10 IOSTANDARD LVCMOS33} [get_ports uart_tx_mirror]
-# set_property -dict {PACKAGE_PIN A9 IOSTANDARD LVCMOS33} [get_ports uart_rx_mirror]
+set_property -dict {PACKAGE_PIN D10 IOSTANDARD LVCMOS33} [get_ports tx_o]
+set_property -dict {PACKAGE_PIN A9 IOSTANDARD LVCMOS33} [get_ports rx_i]
+## JA1
+## JA2
+set_property -dict {PACKAGE_PIN G13 IOSTANDARD LVCMOS33} [get_ports tx_o]
+set_property -dict {PACKAGE_PIN B11 IOSTANDARD LVCMOS33} [get_ports rx_i]
