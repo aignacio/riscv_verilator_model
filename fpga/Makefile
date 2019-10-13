@@ -8,7 +8,8 @@ PATH_FILES	:=	$(abspath ../)
 # List all include folders
 INCL_DIR		:=	$(addprefix $(PATH_FILES)/,$(INC_VERILOG))
 # You can list below all files in the verilog/system verilog format
-PRJ_FILES_V	:=	$(addprefix $(PATH_FILES)/,$(SRC_VERILOG)) \
+PRJ_FILES_V	:=	$(addprefix $(PATH_FILES)/,$(SRC_VERILOG)) 						\
+								$(addprefix $(PATH_FILES)/,$(BOOT_ROM)) 							\
 								$(PATH_FILES)/tb/wrappers/fpga_wrapper/fpga_wrapper.sv
 MACROS_VLOG	:=	$(MACRO_VLOG)
 

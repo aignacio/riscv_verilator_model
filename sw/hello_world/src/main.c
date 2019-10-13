@@ -41,14 +41,14 @@ int main(void) {
     while(1){
         #if VERILATOR == 1
             test++;
-            printf("\nHello World... %d %p %x", test, &test, test);
+            printf("\nHello World  %d %p %x", test, &test, test);
         #else
             toggle = !toggle;
             for (int i = 0;i<12;i++)
                 set_gpio_pin_value(i,toggle);
 
             for (int i=0;i<100000;i++);
-            printf("\nHello World... %d %p %x", test, &test, test);
+            printf("\nHello World %d %p %x", test, &test, test);
         #endif
     };
 }

@@ -5,6 +5,33 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "localhost RISC-V launch",
+            "type": "cppdbg",
+            "targetArchitecture":"ARM",
+            "request": "launch",
+            "program": "${workspaceFolder}/sw/hello_world/output/hello_world.elf",
+            "cwd": "${workspaceRoot}/sw/hello_world/output",
+            "args": [],
+            "stopAtEntry": true,
+            "environment": [],
+            "externalConsole": true,
+            "MIMode": "gdb",
+            "miDebuggerServerAddress": "localhost:3333",
+            "customLaunchSetupCommands": [
+                { "text": "file ${workspaceFolder}/sw/hello_world/output/hello_world.elf", "description": "Loading ELF File" },
+                { "text": "target remote : 3333", "description": "Connecting to the target", "ignoreFailures": true },
+                { "text": "load", "description": "load ELF file to the target", "ignoreFailures": true }
+            ],
+            "launchCompleteCommand": "None",
+            "debugServerArgs": "-f ${workspaceFolder}/tb/debug/riscv_pulp.cfg",
+            "logging": { "engineLogging": true },
+            "linux": {
+                "MIMode": "gdb",
+                "miDebuggerPath": "riscv-none-embed-gdb",
+                "debugServerPath": "riscv-openocd"
+            }
+        },
+        {
             "name": "RISC-V launch",
             "type": "cppdbg",
             "targetArchitecture":"ARM",

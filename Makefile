@@ -38,7 +38,6 @@ else ifeq ($(FPGA_BOARD),pynq)
 	XILINX_TARGET	:=	arty
 	HW_PART				:=	xc7z020_1
 	MEM_PART			:=	s25fl128s-3.3v-qspi-x4-single
-	#xilinx.com:zc702:1.0
 else
 	XILINX_BOARD	:=	digilentinc.com:arty-a7-35:part0:1.0
 	XILINX_PART		:=	xc7a35ticsg324-1L
@@ -147,6 +146,7 @@ SRC_RI5CY_DBG	:= 	ips/riscv-dbg/src/dm_pkg.sv										\
 
 
 # All sources needed to build the verilator model and FPGA
+BOOT_ROM			:=	sw/boot_rom/output/prog_rom.sv
 SRC_VERILOG 	:=	$(foreach IP,$(SOC_IPS),$(shell find $(IPS_FOLDER)/$(IP) -name *.v))
 SRC_VERILOG 	+=	$(foreach IP,$(SOC_IPS),$(shell find $(IPS_FOLDER)/$(IP) -name *.sv))
 SRC_VERILOG		+=	$(SRC_RI5CY_DBG)
@@ -155,7 +155,6 @@ SRC_VERILOG		+=	$(wildcard $(VERILATOR_TB)/wrappers/*.v)
 SRC_VERILOG		+=	$(COMMON_CELLS)
 SRC_VERILOG		+=	$(SRC_FPNEW)
 SRC_VERILOG		+=	$(SRC_RI5CY)
-SRC_VERILOG		+=	sw/boot_rom/output/prog_rom.sv
 INC_VERILOG		:=	$(VERILATOR_TB)/inc								\
 									$(IPS_FOLDER)/riscv/rtl/include		\
 									$(IPS_FOLDER)/common_cells/include
@@ -229,6 +228,7 @@ export SYNTH_MODE
 export FPGA_BOARD
 export HW_PART
 export MEM_PART
+export BOOT_ROM
 ########################################################################
 ###################### DO NOT EDIT ANYTHING BELOW ######################
 ########################################################################
@@ -251,8 +251,11 @@ all: verilator
 
 ####################### FPGA synthesis rules #######################
 .PHONY: openocd_fpga program_mcs mcs fpga
-fpga: $(SRC_VERILOG)
+fpga: $(SRC_VERILOG) $(BOOT_ROM)
 	+@make -C fpga force
+
+sw/boot_rom/%.sv:
+	+@make -C sw/boot_rom all
 
 mcs:
 	+@make -C fpga $@
@@ -282,9 +285,6 @@ $(VERILATOR_EXE): $(OUT_VERILATOR)/V$(ROOT_MOD_VERI).mk
 
 $(OUT_VERILATOR)/V$(ROOT_MOD_VERI).mk: $(SRC_VERILOG) $(SRC_CPP) $(TB_VERILATOR)
 	verilator $(VERIL_ARGS)
-
-sw/boot_rom/%.sv:
-	+@make -C sw/boot_rom all
 
 sw:
 	+@make -C sw/$(TEST_PROG) VERILAT=1 all
