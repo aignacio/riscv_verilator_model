@@ -31,11 +31,12 @@ TEMP				:=	output_temp
 TARGET			:=	$(ODIR)/$(TARGET_NAME)
 LD_SCRIPT		:=	-Tsections.ld
 MACROS			:=	-DVERILATOR=$(VERILAT)
-INC					:=	common
-INC_API			:=	API/inc
+COMMON			:=	../common
+INC					:=	$(COMMON)/base
+INC_API			:=	$(COMMON)/API/inc
 _OBJ    		:=	$(patsubst init/%,%.o,$(basename $(wildcard init/*.S)))
 _OBJ    		+=	$(patsubst init/%,%.o,$(basename $(wildcard init/*.c)))
-_OBJ    		+=	$(patsubst API/src/%,%.o,$(basename $(wildcard API/src/*.c)))
+_OBJ    		+=	$(patsubst $(COMMON)/API/src/%,%.o,$(basename $(wildcard $(COMMON)/API/src/*.c)))
 _OBJ    		+=	$(patsubst src/%,%.o,$(basename $(wildcard src/*.c)))
 OBJ					:=	$(patsubst %,$(TEMP)/%,$(_OBJ))
 
@@ -82,7 +83,7 @@ $(TEMP)/%.o:  src/%.c
 	@echo "Building $@"
 	$(CC) $(CFLAGS) -save-temps=obj $(MACROS) -I$(INC_API) -I$(INC) -c $< -o $@
 
-$(TEMP)/%.o:  API/src/%.c
+$(TEMP)/%.o:  $(COMMON)/API/src/%.c
 	@echo "Building $@"
 	$(CC) $(CFLAGS) -save-temps=obj $(MACROS) -I$(INC_API) -I$(INC) -c $< -o $@
 
@@ -90,6 +91,8 @@ debug:
 	@echo "Use disass /m name_of_the_function to search for a function in assembly/c\n"
 	$(GDB) $(TARGET).elf
 
+test:
+	@echo
 clean:
 	@echo "Cleaning all..."
 	rm -rf $(ODIR)

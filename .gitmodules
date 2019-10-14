@@ -37,3 +37,6 @@
 [submodule "ips/apb_uart_sv"]
 	path = ips/apb_uart_sv
 	url = git@github.com:pulp-platform/apb_uart_sv.git
+[submodule "ips/apb_event_unit"]
+	path = ips/apb_event_unit
+	url = git@github.com:pulp-platform/apb_event_unit.git

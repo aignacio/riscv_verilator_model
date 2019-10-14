@@ -6,7 +6,7 @@
   `define AHB_HDATA_SIZE      32 // bit-width AHB data
 
   `define APB_ADDR_WIDTH      16 // Effective address
-  `define APB_SLAVES_NUM      5  // Number of slaves APB
+  `define APB_SLAVES_NUM      4  // Number of slaves APB
   `define APB_PADDR_SIZE      32 // bit-width APB address
   `define APB_PDATA_SIZE      32 // bit-width APB data
   `define APB_BASE_ADDR_ALL   32'h4000_0000
@@ -40,12 +40,10 @@
     '{`APB_BASE_ADDR_ALL+32'h0000_0000,
       `APB_BASE_ADDR_ALL+32'h0001_0000,
       `APB_BASE_ADDR_ALL+32'h0002_0000,
-      `APB_BASE_ADDR_ALL+32'h0003_0000,
-      `APB_BASE_ADDR_ALL+32'h0004_0000},
+      `APB_BASE_ADDR_ALL+32'h0003_0000},
     '{`APB_BASE_ADDR_ALL+32'h0000_FFFF,
       `APB_BASE_ADDR_ALL+32'h0001_FFFF,
       `APB_BASE_ADDR_ALL+32'h0002_FFFF,
-      `APB_BASE_ADDR_ALL+32'h0003_FFFF,
-      `APB_BASE_ADDR_ALL+32'h0004_FFFF}
+      `APB_BASE_ADDR_ALL+32'h0003_FFFF}
   };
 `endif

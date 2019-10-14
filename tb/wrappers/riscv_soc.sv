@@ -27,6 +27,21 @@ module riscv_soc
   output  jtag_tdo,
   input   jtag_trstn
 );
+  logic [3:0] timer_irq;
+  logic s_gpio_event;
+  logic s_uart_event;
+  logic core_busy;
+  logic [31:0] irq_signals;
+  logic [4:0] irq_id;
+
+  always_comb begin
+    irq_id = '0;
+    for (int i = 0; i < 32; i+=1) begin
+      if(irq_signals[i]) begin
+        irq_id = i[4:0];
+      end
+    end
+  end
 
   /**********************
     AHB WIREUP SIGNALS
@@ -203,13 +218,13 @@ module riscv_soc
     .core_id_i(`CORE_ID),
     .cluster_id_i(`CLUSTER_ID),
     .fetch_enable_i(fetch_enable_i),
-    .core_busy_o(),
+    .core_busy_o(core_busy),
     .ext_perf_counters_i('0),
     .debug_req_i(dm_debug_req[`CORE_MHARTID]),
     .sec_lvl_o(),
     // IRQ Signals
-    .irq_i('0),
-    .irq_id_i('0),
+    .irq_i((|irq_signals)),
+    .irq_id_i(irq_id),
     .irq_ack_o(),
     .irq_id_o(),
     .irq_sec_i('0),
@@ -589,7 +604,7 @@ module riscv_soc
     .gpio_out(gpio_out),
     .gpio_dir(),
     .gpio_padcfg(),
-    .interrupt()
+    .interrupt(s_gpio_event)
   );
 
   apb_uart_sv #(
@@ -607,8 +622,46 @@ module riscv_soc
     .PSLVERR(apb_slaves[1].PSLVERR),
     .rx_i(rx_i),
     .tx_o(tx_o),
-    .event_o()
+    .event_o(s_uart_event)
   );
+
+  apb_timer apb_timer (
+    .HCLK(core_clk),
+    .HRESETn(reset_n),
+
+    .PADDR(apb_ahb_bridge.PADDR[`APB_ADDR_WIDTH-1:0]),
+    .PWDATA(apb_ahb_bridge.PWDATA),
+    .PWRITE(apb_ahb_bridge.PWRITE),
+    .PSEL(apb_slaves[2].PSEL),
+    .PENABLE(apb_ahb_bridge.PENABLE),
+    .PRDATA(apb_slaves[2].PRDATA),
+    .PREADY(apb_slaves[2].PREADY),
+    .PSLVERR(apb_slaves[2].PSLVERR),
+    .irq_o(timer_irq)
+  );
+
+  apb_event_unit apb_event_unit (
+    .clk_i(core_clk),
+    .HCLK(USE_SAME_CLOCK_CORE_PERIPH ? core_clk : periph_clk),
+    .HRESETn(reset_n),
+
+    .PADDR(apb_ahb_bridge.PADDR[`APB_ADDR_WIDTH-1:0]),
+    .PWDATA(apb_ahb_bridge.PWDATA),
+    .PWRITE(apb_ahb_bridge.PWRITE),
+    .PSEL(apb_slaves[3].PSEL),
+    .PENABLE(apb_ahb_bridge.PENABLE),
+    .PRDATA(apb_slaves[3].PRDATA),
+    .PREADY(apb_slaves[3].PREADY),
+    .PSLVERR(apb_slaves[3].PSLVERR),
+    .irq_i( {3'b0, timer_irq, s_gpio_event, s_uart_event, 23'b0} ),
+    .event_i( {3'b0, timer_irq, s_gpio_event, s_uart_event, 23'b0} ),
+    .irq_o(irq_signals),
+    .fetch_enable_i(fetch_enable_i),
+    .fetch_enable_o(),
+    .clk_gate_core_o(),
+    .core_busy_i(core_busy)
+  );
+
 `ifdef VERILATOR
   function [7:0] getbufferReq;
     /* verilator public */

@@ -64,14 +64,18 @@ DEPEND	   		:=	git				\
 									verilator
 
 # All the ips that are needed to build
-SOC_IPS				:=	ahb3lite_pkg							\
-									ahb3lite_memory						\
-									ahb3lite_interconnect/rtl	\
-									ahb3lite_apb_bridge				\
-									apb_gpio 									\
-									memory 										\
-									apb4_mux 									\
-									apb_uart_sv								\
+SOC_IPS				:=	ahb3lite_pkg									\
+									ahb3lite_memory								\
+									ahb3lite_interconnect/rtl			\
+									ahb3lite_apb_bridge						\
+									apb_gpio 											\
+									memory 												\
+									apb4_mux 											\
+									apb_uart_sv/apb_uart.sv				\
+									apb_uart_sv/uart_interrupt.sv	\
+									apb_uart_sv/uart_rx.sv				\
+									apb_uart_sv/uart_tx.sv				\
+									apb_event_unit								\
 									utils
 
 # RI5CY RTLs files
@@ -144,20 +148,20 @@ SRC_RI5CY_DBG	:= 	ips/riscv-dbg/src/dm_pkg.sv										\
 									ips/riscv-dbg/src/dm_mem.sv										\
 									ips/riscv-dbg/debug_rom/debug_rom.sv
 
-
 # All sources needed to build the verilator model and FPGA
 BOOT_ROM			:=	sw/boot_rom/output/prog_rom.sv
-SRC_VERILOG 	:=	$(foreach IP,$(SOC_IPS),$(shell find $(IPS_FOLDER)/$(IP) -name *.v))
-SRC_VERILOG 	+=	$(foreach IP,$(SOC_IPS),$(shell find $(IPS_FOLDER)/$(IP) -name *.sv))
+SRC_VERILOG 	:=	$(foreach IP,$(SOC_IPS),$(shell find $(IPS_FOLDER)/$(IP) -type f -name *.v))
+SRC_VERILOG 	+=	$(foreach IP,$(SOC_IPS),$(shell find $(IPS_FOLDER)/$(IP) -type f -name *.sv))
 SRC_VERILOG		+=	$(SRC_RI5CY_DBG)
 SRC_VERILOG		+=	$(wildcard $(VERILATOR_TB)/wrappers/*.sv)
 SRC_VERILOG		+=	$(wildcard $(VERILATOR_TB)/wrappers/*.v)
 SRC_VERILOG		+=	$(COMMON_CELLS)
 SRC_VERILOG		+=	$(SRC_FPNEW)
 SRC_VERILOG		+=	$(SRC_RI5CY)
-INC_VERILOG		:=	$(VERILATOR_TB)/inc								\
-									$(IPS_FOLDER)/riscv/rtl/include		\
-									$(IPS_FOLDER)/common_cells/include
+INC_VERILOG		:=	$(VERILATOR_TB)/inc										\
+									$(IPS_FOLDER)/riscv/rtl/include				\
+									$(IPS_FOLDER)/common_cells/include		\
+									$(IPS_FOLDER)/apb_event_unit/include
 INCS_VERILOG	:=	$(addprefix +incdir+,$(INC_VERILOG))
 MACRO_VLOG		:=	IRAM_KB_SIZE=$(IRAM_KB_SIZE)			\
 									DRAM_KB_SIZE=$(DRAM_KB_SIZE)			\
@@ -240,7 +244,8 @@ help:
 	@echo "wave		- open gtkwave with waveform vcd dump"
 	@echo "gdb		- run gdb to connect to the target and load"
 	@echo "fpga		- synthetize riscv_soc throught vivado for fpga targets"
-	@echo "clean		- clean verilator/fpga output builds"
+	@echo "clean_fpga	- clean fpga build"
+	@echo "clean		- clean verilator output builds"
 	@echo "check		- check dependencies for running the project"
 	@echo "install		- install dependencies through apt-get"
 	@echo "docker		- build docker image with verilator + jtag"
@@ -250,7 +255,7 @@ help:
 all: verilator
 
 ####################### FPGA synthesis rules #######################
-.PHONY: openocd_fpga program_mcs mcs fpga
+.PHONY: openocd_fpga program_mcs mcs fpga clean_fpga
 fpga: $(SRC_VERILOG) $(BOOT_ROM)
 	+@make -C fpga force
 
@@ -265,6 +270,10 @@ program_mcs:
 
 openocd_fpga:
 	riscv-openocd -f tb/debug/esp-prog.cfg -f tb/debug/riscv_pulp_fpga.cfg
+
+clean_fpga:
+	+@make -C fpga clean
+	+@make -C sw/boot_rom clean
 
 ####################### verilator simulation rules #######################
 .PHONY: wave run verilator sw openocd gdb clean
@@ -300,8 +309,6 @@ clean:
 	$(info rm -rf $(OUT_VERILATOR))
 	@rm -rf $(OUT_VERILATOR)
 	+@make -C sw/$(TEST_PROG) clean
-	+@make -C sw/boot_rom clean
-	+@make -C fpga clean
 
 ####################### check for dependencies #######################
 .PHONY: setup check install docker rundocker
@@ -318,7 +325,7 @@ docker:
 	docker build -t riscv_model --build-arg ssh_prv_key="$(SSH_KEY)" --build-arg ssh_pub_key="$(SSH_KEY_PUB)" dockerfile
 
 rundocker:
-	docker run -p 8080:8080 riscv_model:latest
+	docker run --rm -it -p 8080:8080 riscv_model:latest
 ####################### functions #######################
 define check_program
 	$(info Checking program [$(1)]...)

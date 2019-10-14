@@ -24,6 +24,8 @@
  */
 
 #include <stdint.h>
+#include <stdio.h>
+
 #include "encoding.h"
 #include "riscv_soc_utils.h"
 
@@ -50,26 +52,9 @@ void __attribute__((naked,__section__(".init"))) _start(void) {
     asm volatile("la sp, _start_stack");
 
     /* Set up vectored interrupt, with starting at offset 0x100 */
-    asm volatile("csrw mtvec, %0":: "r"((uint8_t *)(&_start_vector) + 1));
+    // asm volatile("csrw mtvec, %0":: "r"((uint8_t *)(&_start_vector) + 1));
 
-    // register uint32_t *src, *dst;
-
-    // src = (uint32_t *) &_stored_data;
-    // dst = (uint32_t *) &_start_data;
-
-    // /* Copy the .data section from flash to RAM. */
-    // while (dst < (uint32_t *)&_end_data) {
-    //     *dst = *src;
-    //     dst++;
-    //     src++;
-    // }
-
-    // /* Initialize the BSS section to 0 */
-    // dst = &_start_bss;
-    // while (dst < (uint32_t *)&_end_bss) {
-    //     *dst = 0U;
-    //     dst++;
-    // }
+    write_csr(mtvec,&_start_vector);
 
     main();
 }
@@ -81,7 +66,7 @@ void __attribute__((weak)) isr_synctrap(void) {
 }
 
 void __attribute__((weak)) isr_m_external(void) {
-    write_csr(mip, (0 << IRQ_M_EXT));
+    // write_csr(mip, (0 << IRQ_M_EXT));
     return;
     while(1);
 }

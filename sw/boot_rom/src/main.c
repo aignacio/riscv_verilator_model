@@ -5,8 +5,6 @@
 
 #include "riscv_soc_utils.h"
 #include "gpio.h"
-#include "spi.h"
-#include "i2c.h"
 #include "uart.h"
 #include "encoding.h"
 
@@ -30,15 +28,22 @@ int main(void) {
         set_gpio_pin_direction(i,DIR_OUT);
     for (int i = 12;i<16;i++)
         set_gpio_pin_direction(i,DIR_IN);
-
-    uart_set_cfg(0, 49);
+     for (int i = 0;i<12;i++)
+            set_gpio_pin_value(i,false);
 
     while(1){
-        toggle = !toggle;
-        for (int i = 0;i<12;i++)
-            set_gpio_pin_value(i,toggle);
-
-        for (int i=0;i<1000000;i++);
-        printf("\n[BOOT ROM]");
-    };
+        // greens = 1,4,7,10
+        // blues = 2,5,8,11
+        // red = 0,3,6,9
+        for (int j = 0; j<3;j++){
+            for (int i = j;i<12;i+=3){
+                set_gpio_pin_value(i,true);
+                for (int i=0;i<100000;i++);
+            }
+            for (int i = j;i<12;i+=3){
+                set_gpio_pin_value(i,false);
+                for (int i=0;i<100000;i++);
+            }
+        }
+    }
 }

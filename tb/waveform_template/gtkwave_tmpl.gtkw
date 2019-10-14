@@ -1,16 +1,16 @@
 [*]
 [*] GTKWave Analyzer v3.3.98 (w)1999-2019 BSI
-[*] Fri Oct 11 18:42:55 2019
+[*] Mon Oct 14 17:08:50 2019
 [*]
 [dumpfile] "/tmp/riscv_soc.vcd"
-[dumpfile_mtime] "Fri Oct 11 18:30:58 2019"
-[dumpfile_size] 7176617
+[dumpfile_mtime] "Mon Oct 14 17:07:51 2019"
+[dumpfile_size] 278741299
 [optimize_vcd]
 [savefile] "/home/aignacio/projects/riscv_verilator_model/tb/waveform_template/gtkwave_tmpl.gtkw"
-[timestart] 1
-[size] 1920 1016
-[pos] 1920 27
-*-3.224949 18 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[timestart] 29
+[size] 1920 1080
+[pos] 0 0
+*0.000000 30 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TOP.
 [treeopen] TOP.riscv_soc.
 [treeopen] TOP.riscv_soc.data_ram.ram_inst.
@@ -20,21 +20,24 @@
 [treeopen] TOP.riscv_soc.instr_ram.ram_inst.genblk2.
 [treeopen] TOP.riscv_soc.instr_ram.ram_inst.genblk2.genblk2.
 [treeopen] TOP.riscv_soc.riscv_cpu.
-[treeopen] TOP.riscv_soc.riscv_cpu.riscv_core_i.id_stage_i.
-[treeopen] TOP.riscv_soc.riscv_cpu.riscv_core_i.id_stage_i.registers_i.
-[sst_width] 228
-[signals_width] 268
+[treeopen] TOP.riscv_soc.riscv_cpu.riscv_core_i.
+[treeopen] TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.
+[treeopen] TOP.riscv_soc.riscv_cpu.riscv_core_i.if_stage_i.
+[sst_width] 365
+[signals_width] 297
 [sst_expanded] 1
-[sst_vpaned_height] 420
+[sst_vpaned_height] 500
 @28
+TOP.periph_clk
+TOP.core_clk
 TOP.riscv_soc.dm_debug_req[0]
 TOP.riscv_soc.ndmreset_n
 TOP.riscv_soc.reset_n
 @22
 TOP.riscv_soc.riscv_cpu.boot_addr_i[31:0]
-TOP.riscv_soc.riscv_cpu.riscv_core_i.id_stage_i.instr[31:0]
 TOP.riscv_soc.riscv_cpu.riscv_core_i.id_stage_i.pc_id_i[31:0]
-@800200
+TOP.riscv_soc.riscv_cpu.riscv_core_i.id_stage_i.instr[31:0]
+@c00200
 -instr_ahb
 @22
 TOP.riscv_soc.riscv_cpu.instr_haddr_o[31:0]
@@ -59,9 +62,9 @@ TOP.riscv_soc.riscv_cpu.instr_htrans_o[1:0]
 TOP.riscv_soc.riscv_cpu.instr_hwdata_o[31:0]
 @28
 TOP.riscv_soc.riscv_cpu.instr_hwrite_o
-@1000200
+@1401200
 -instr_ahb
-@800200
+@c00200
 -data_ahb
 @22
 TOP.riscv_soc.riscv_cpu.data_haddr_o[31:0]
@@ -86,15 +89,123 @@ TOP.riscv_soc.riscv_cpu.data_htrans_o[1:0]
 TOP.riscv_soc.riscv_cpu.data_hwdata_o[31:0]
 @28
 TOP.riscv_soc.riscv_cpu.data_hwrite_o
-@1000200
+@1401200
 -data_ahb
+@c00022
+TOP.riscv_soc.apb_event_unit.irq_i[31:0]
 @28
-TOP.riscv_soc.riscv_cpu.ahb_instr_filter.en_addr[5:0]
-TOP.riscv_soc.riscv_cpu.ahb_data_filter.en_addr[5:0]
-@29
-TOP.riscv_soc.riscv_cpu.instr_ahb.hreadyout_i
+(0)TOP.riscv_soc.apb_event_unit.irq_i[31:0]
+(1)TOP.riscv_soc.apb_event_unit.irq_i[31:0]
+(2)TOP.riscv_soc.apb_event_unit.irq_i[31:0]
+(3)TOP.riscv_soc.apb_event_unit.irq_i[31:0]
+(4)TOP.riscv_soc.apb_event_unit.irq_i[31:0]
+(5)TOP.riscv_soc.apb_event_unit.irq_i[31:0]
+(6)TOP.riscv_soc.apb_event_unit.irq_i[31:0]
+(7)TOP.riscv_soc.apb_event_unit.irq_i[31:0]
+(8)TOP.riscv_soc.apb_event_unit.irq_i[31:0]
+(9)TOP.riscv_soc.apb_event_unit.irq_i[31:0]
+(10)TOP.riscv_soc.apb_event_unit.irq_i[31:0]
+(11)TOP.riscv_soc.apb_event_unit.irq_i[31:0]
+(12)TOP.riscv_soc.apb_event_unit.irq_i[31:0]
+(13)TOP.riscv_soc.apb_event_unit.irq_i[31:0]
+(14)TOP.riscv_soc.apb_event_unit.irq_i[31:0]
+(15)TOP.riscv_soc.apb_event_unit.irq_i[31:0]
+(16)TOP.riscv_soc.apb_event_unit.irq_i[31:0]
+(17)TOP.riscv_soc.apb_event_unit.irq_i[31:0]
+(18)TOP.riscv_soc.apb_event_unit.irq_i[31:0]
+(19)TOP.riscv_soc.apb_event_unit.irq_i[31:0]
+(20)TOP.riscv_soc.apb_event_unit.irq_i[31:0]
+(21)TOP.riscv_soc.apb_event_unit.irq_i[31:0]
+(22)TOP.riscv_soc.apb_event_unit.irq_i[31:0]
+(23)TOP.riscv_soc.apb_event_unit.irq_i[31:0]
+(24)TOP.riscv_soc.apb_event_unit.irq_i[31:0]
+(25)TOP.riscv_soc.apb_event_unit.irq_i[31:0]
+(26)TOP.riscv_soc.apb_event_unit.irq_i[31:0]
+(27)TOP.riscv_soc.apb_event_unit.irq_i[31:0]
+(28)TOP.riscv_soc.apb_event_unit.irq_i[31:0]
+(29)TOP.riscv_soc.apb_event_unit.irq_i[31:0]
+(30)TOP.riscv_soc.apb_event_unit.irq_i[31:0]
+(31)TOP.riscv_soc.apb_event_unit.irq_i[31:0]
+@1401200
+-group_end
 @28
-TOP.riscv_soc.riscv_cpu.instr_ahb.req_i
-TOP.riscv_soc.riscv_cpu.instr_ahb.gnt_o
+TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_we_int
+@22
+TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_addr_i[11:0]
+@c00022
+TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_i[31:0]
+@28
+(0)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_i[31:0]
+(1)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_i[31:0]
+(2)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_i[31:0]
+(3)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_i[31:0]
+(4)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_i[31:0]
+(5)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_i[31:0]
+(6)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_i[31:0]
+(7)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_i[31:0]
+(8)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_i[31:0]
+(9)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_i[31:0]
+(10)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_i[31:0]
+(11)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_i[31:0]
+(12)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_i[31:0]
+(13)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_i[31:0]
+(14)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_i[31:0]
+(15)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_i[31:0]
+(16)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_i[31:0]
+(17)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_i[31:0]
+(18)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_i[31:0]
+(19)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_i[31:0]
+(20)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_i[31:0]
+(21)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_i[31:0]
+(22)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_i[31:0]
+(23)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_i[31:0]
+(24)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_i[31:0]
+(25)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_i[31:0]
+(26)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_i[31:0]
+(27)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_i[31:0]
+(28)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_i[31:0]
+(29)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_i[31:0]
+(30)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_i[31:0]
+(31)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_i[31:0]
+@1401200
+-group_end
+@800022
+TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_int[31:0]
+@c00022
+#{TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_int[31:8]} (0)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_int[31:0] (1)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_int[31:0] (2)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_int[31:0] (3)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_int[31:0] (4)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_int[31:0] (5)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_int[31:0] (6)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_int[31:0] (7)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_int[31:0] (8)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_int[31:0] (9)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_int[31:0] (10)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_int[31:0] (11)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_int[31:0] (12)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_int[31:0] (13)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_int[31:0] (14)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_int[31:0] (15)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_int[31:0] (16)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_int[31:0] (17)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_int[31:0] (18)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_int[31:0] (19)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_int[31:0] (20)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_int[31:0] (21)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_int[31:0] (22)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_int[31:0] (23)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_int[31:0]
+@28
+(0)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_int[31:0]
+(1)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_int[31:0]
+(2)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_int[31:0]
+(3)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_int[31:0]
+(4)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_int[31:0]
+(5)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_int[31:0]
+(6)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_int[31:0]
+(7)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_int[31:0]
+(8)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_int[31:0]
+(9)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_int[31:0]
+(10)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_int[31:0]
+(11)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_int[31:0]
+(12)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_int[31:0]
+(13)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_int[31:0]
+(14)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_int[31:0]
+(15)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_int[31:0]
+(16)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_int[31:0]
+(17)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_int[31:0]
+(18)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_int[31:0]
+(19)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_int[31:0]
+(20)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_int[31:0]
+(21)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_int[31:0]
+(22)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_int[31:0]
+(23)TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_int[31:0]
+@1401200
+-group_end
+@1001200
+-group_end
+@22
+TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.mtvec_n[23:0]
+TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.mtvec_q[23:0]
+@23
+TOP.riscv_soc.riscv_cpu.riscv_core_i.if_stage_i.m_trap_base_addr_i[23:0]
 [pattern_trace] 1
 [pattern_trace] 0
