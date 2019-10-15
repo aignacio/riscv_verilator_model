@@ -149,6 +149,7 @@ void jtag_rbb::read_cmd(bool block_or_nonblocking){
         fprintf(stderr, "\nRemote end disconnected\n");
         close(client_sck);
         client_sck = 0;
+        exit(EXIT_SUCCESS);
     }
 }
 

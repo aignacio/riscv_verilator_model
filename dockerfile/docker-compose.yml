@@ -1,8 +1,0 @@
-version: '0.1'
-services:
-  verilator:
-    build: .
-    volumes:
-        - ~/.ssh:/root/.ssh
-    ports:
-        - "8080:8080"

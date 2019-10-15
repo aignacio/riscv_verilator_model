@@ -219,7 +219,7 @@ int main(int argc, char** argv, char** env){
     sigIntHandler.sa_flags = 0;
     sigaction(SIGINT, &sigIntHandler, NULL);
 
-    while(JTAG_BOOT ? ~rbb->quit : true) {
+    while(true) {
         if (JTAG_BOOT)
             rbb->read_cmd(false);
 		soc->tick();
