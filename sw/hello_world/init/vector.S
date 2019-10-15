@@ -107,7 +107,7 @@ trap_vectors:
     j trap_machine_external_int
     j trap_machine_external_int
     j trap_machine_external_int
-    j trap_machine_external_int
+    j machine_timer_trap
     j trap_machine_external_int
     j trap_machine_external_int
     j trap_machine_external_int
@@ -121,4 +121,9 @@ _synctrap:
 trap_machine_external_int:
     trap_entry
     jal isr_m_external
+    trap_exit
+
+machine_timer_trap:
+    trap_entry
+    jal isr_m_timer
     trap_exit

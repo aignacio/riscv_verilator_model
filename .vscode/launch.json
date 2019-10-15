@@ -50,12 +50,12 @@
                 { "text": "load", "description": "load ELF file to the target", "ignoreFailures": true }
             ],
             "launchCompleteCommand": "None",
-            "debugServerArgs": "-f ${workspaceFolder}/tb/debug/esp-prog.cfg -f ${workspaceFolder}/tb/debug/riscv_pulp_fpga.cfg",
+            // "debugServerArgs": "-f ${workspaceFolder}/tb/debug/esp-prog.cfg -f ${workspaceFolder}/tb/debug/riscv_pulp_fpga.cfg",
             "logging": { "engineLogging": true },
             "linux": {
                 "MIMode": "gdb",
-                "miDebuggerPath": "riscv-none-embed-gdb",
-                "debugServerPath": "riscv-openocd"
+                "miDebuggerPath": "riscv-none-embed-gdb"//,
+                // "debugServerPath": "riscv-openocd"
             }
         }
     ]

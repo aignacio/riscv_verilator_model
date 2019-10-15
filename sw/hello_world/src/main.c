@@ -34,19 +34,22 @@ void loop_leds(){
     for (int j = 0; j<3;j++){
         for (int i = j;i<12;i+=3){
             set_gpio_pin_value(i,true);
-            for (int i=0;i<100000;i++);
+            for (int t=0;t<100000;t++);
         }
         for (int i = j;i<12;i+=3){
             set_gpio_pin_value(i,false);
-            for (int i=0;i<100000;i++);
+            for (int t=0;t<100000;t++);
         }
     }
 }
 
-void isr_m_external(void) {
+void isr_m_timer(void) {
     // write_csr(mip, (0 << IRQ_M_EXT));
-    printf("\nTrap Timer!\n");
+    printf("\n\rHello World - trap Timer!");
     int_periph_clear(1 << TIMER_A_OUTPUT_CMP);
+    set_cmp(20000000);
+    loop_leds();
+
     return;
     while(1);
 }
@@ -66,15 +69,12 @@ int main(void) {
     // clk_counter = periph_clk / baud_rate
     // clk_counter = 80 = 250k
     // clk_counter = 174 ~115200
-    uart_set_cfg(0, 174);
+    uart_set_cfg(0, 130);
 
     cfg_int(true);
-
     int_periph_clear(1 << TIMER_A_OUTPUT_CMP);
-
     int_periph_enable(1 << TIMER_A_OUTPUT_CMP);
-
-    set_cmp(30000);
+    set_cmp(20000000);
 
     start_timer();
 
@@ -82,11 +82,10 @@ int main(void) {
         #if VERILATOR == 1
             printf("\nHello World = %d", get_time());
         #else
-            loop_leds();
-            int mtvec = read_csr(mtvec);
-            int mtimer = get_time();
-            printf("\nMTVEC %x", mtvec);
-            printf("\nHello World %d %p %x", test, &test, test);
+            // printf("\n\rHello... %d",get_time());
+            // int mtvec = read_csr(mtvec);
+            // int mtimer = get_time();
+            // printf("\n\rMTIMER = %x", mtimer);
         #endif
     };
 }

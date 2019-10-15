@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "riscv_soc_utils.h": "c",
+        "timer.h": "c"
+    }
+}

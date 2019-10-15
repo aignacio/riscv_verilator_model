@@ -45,8 +45,8 @@ if { $fpga_board == "pynq" } {
         CONFIG.CLKOUT2_USED {true} \
         CONFIG.CLK_OUT1_PORT {core_clk} \
         CONFIG.CLK_OUT2_PORT {periph_clk} \
-        CONFIG.CLKOUT1_REQUESTED_OUT_FREQ {35} \
-        CONFIG.CLKOUT2_REQUESTED_OUT_FREQ {20} \
+        CONFIG.CLKOUT1_REQUESTED_OUT_FREQ {30} \
+        CONFIG.CLKOUT2_REQUESTED_OUT_FREQ {15} \
         ] [get_ips mmcm]
 }
 

@@ -67,6 +67,6 @@ void __attribute__((weak)) isr_synctrap(void) {
 
 void __attribute__((weak)) isr_m_external(void) {
     // write_csr(mip, (0 << IRQ_M_EXT));
-    return;
     while(1);
+    return;
 }
