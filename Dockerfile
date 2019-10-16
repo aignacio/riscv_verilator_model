@@ -6,7 +6,7 @@ RUN apt-get update && \
 
 COPY . /rv
 RUN cd /rv && \
-    make verilator JTAG_BOOT=1 JTAG_PORT=8080
+    make JTAG_BOOT=1 JTAG_PORT=8080 MAX_THREAD=12 verilator
 EXPOSE 8080/tcp
 WORKDIR /rv/output_verilator
 CMD ./riscv_soc
