@@ -10,12 +10,12 @@ module riscv_soc
   import dm::*;        // once dm package declares variables with same name
 `endif                 // as riscv_defines, we should use local scope to import (vivado complainss)
 #(
-  parameter USE_SAME_CLOCK_CORE_PERIPH = 1
+  parameter USE_SAME_CLOCK_CORE_PERIPH = 1,
+  parameter DEFAULT_BOOT_ADDR = 32'h1A00_0000
 )(
   input   core_clk,
   input   periph_clk,
   input   reset_n,
-  input   [31:0] boot_addr_i,
   input   fetch_enable_i,
   output  [11:0] gpio_out,
   input   [3:0] gpio_in,
@@ -27,6 +27,7 @@ module riscv_soc
   output  jtag_tdo,
   input   jtag_trstn
 );
+  logic [31:0] rst_addr;
   logic [3:0] timer_irq;
   logic s_gpio_event;
   logic s_uart_event;
@@ -214,7 +215,7 @@ module riscv_soc
     .core_rstn(reset_n & ndmreset_n),
     // Control signals
     .clk_en_i('1),
-    .boot_addr_i(boot_addr_i),
+    .boot_addr_i(rst_addr),
     .core_id_i(`CORE_ID),
     .cluster_id_i(`CLUSTER_ID),
     .fetch_enable_i(fetch_enable_i),
@@ -587,7 +588,7 @@ module riscv_soc
 
   apb_gpio #(
     .APB_ADDR_WIDTH(`APB_ADDR_WIDTH)
-  ) gpio_0 (
+  ) gpio (
     .HCLK(USE_SAME_CLOCK_CORE_PERIPH ? core_clk : periph_clk),
     .HRESETn(reset_n),
     .dft_cg_enable_i(1'b0),
@@ -651,9 +652,8 @@ module riscv_soc
 `endif
 
   apb_timer apb_timer (
-    .HCLK(core_clk),
+    .HCLK(USE_SAME_CLOCK_CORE_PERIPH ? core_clk : periph_clk),
     .HRESETn(reset_n),
-
     .PADDR(apb_ahb_bridge.PADDR[`APB_ADDR_WIDTH-1:0]),
     .PWDATA(apb_ahb_bridge.PWDATA),
     .PWRITE(apb_ahb_bridge.PWRITE),
@@ -669,7 +669,6 @@ module riscv_soc
     .clk_i(core_clk),
     .HCLK(USE_SAME_CLOCK_CORE_PERIPH ? core_clk : periph_clk),
     .HRESETn(reset_n),
-
     .PADDR(apb_ahb_bridge.PADDR[`APB_ADDR_WIDTH-1:0]),
     .PWDATA(apb_ahb_bridge.PWDATA),
     .PWRITE(apb_ahb_bridge.PWRITE),
@@ -687,6 +686,24 @@ module riscv_soc
     .core_busy_i(core_busy)
   );
 
+  rst_ctrl_unit # (
+    .PADDR_SIZE(`APB_PADDR_SIZE),
+    .PDATA_SIZE(`APB_PDATA_SIZE),
+    .DEFAULT_BOOT_ADDR(DEFAULT_BOOT_ADDR)
+  ) rst_ctrl (
+    .PCLK(USE_SAME_CLOCK_CORE_PERIPH ? core_clk : periph_clk),
+    .RESETn(reset_n),
+    .PADDR(apb_ahb_bridge.PADDR[`APB_ADDR_WIDTH-1:0]),
+    .PWDATA(apb_ahb_bridge.PWDATA),
+    .PWRITE(apb_ahb_bridge.PWRITE),
+    .PSEL(apb_slaves[4].PSEL),
+    .PENABLE(apb_ahb_bridge.PENABLE),
+    .PRDATA(apb_slaves[4].PRDATA),
+    .PREADY(apb_slaves[4].PREADY),
+    .PSLVERR(apb_slaves[4].PSLVERR),
+    .rst_addr_o(rst_addr)
+  );
+
 `ifdef VERILATOR
   function [7:0] getbufferReq;
     /* verilator public */
@@ -699,6 +716,14 @@ module riscv_soc
     /* verilator public */
     begin
       printfbufferReq = ((ahb_master[1].HADDR == 32'h1C00_0000) && ahb_master[1].HWRITE);
+    end
+  endfunction
+
+  function writeRstAddr;
+    /* verilator public */
+    input [31:0] boot_addr;
+    begin
+      rst_ctrl.rst_addr = boot_addr;
     end
   endfunction
 

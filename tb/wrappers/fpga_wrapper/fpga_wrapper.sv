@@ -48,7 +48,6 @@ module artix_wrapper (
     .core_clk(core_clk),
     .periph_clk(periph_clk),
     .reset_n(reset_n),
-    .boot_addr_i(32'h1A00_0000),    // Fixed in boot loop
     .fetch_enable_i(fetch_enable),
     .gpio_out(gpio_out),
     .gpio_in(gpio_in),

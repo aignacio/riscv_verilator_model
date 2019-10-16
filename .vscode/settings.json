@@ -1,6 +1,8 @@
 {
     "files.associations": {
+        "*.config": "bat",
         "riscv_soc_utils.h": "c",
-        "timer.h": "c"
+        "timer.h": "c",
+        "ostream": "cpp"
     }
 }
