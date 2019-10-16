@@ -42,4 +42,4 @@
 	url = https://github.com/pulp-platform/apb_event_unit.git
 [submodule "ips/apb_uart"]
 	path = ips/apb_uart
-	url = git@github.com:pulp-platform/apb_uart.git
+	url = https://github.com/pulp-platform/apb_uart.git
