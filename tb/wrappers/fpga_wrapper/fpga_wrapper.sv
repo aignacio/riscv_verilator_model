@@ -13,6 +13,8 @@ module artix_wrapper (
   input   [3:0] gpio_in,
   input   rx_i,
   output  tx_o,
+  input   rx_mirror_i,
+  output  tx_mirror_o,
   // Status
   output  clk_locked
 );
@@ -21,9 +23,13 @@ module artix_wrapper (
   logic status_clk;
   logic locked;
   logic fetch_enable;
+  logic rx, tx;
 
   assign fetch_enable = locked;
   assign clk_locked = locked;
+  assign tx_o = tx;
+  assign tx_mirror_o = tx;
+  assign rx = rx_i | rx_mirror_i;
 
   mmcm clk_mmcm (
     // Clock in ports
@@ -46,8 +52,8 @@ module artix_wrapper (
     .fetch_enable_i(fetch_enable),
     .gpio_out(gpio_out),
     .gpio_in(gpio_in),
-    .rx_i(rx_i),
-    .tx_o(tx_o),
+    .rx_i(rx),
+    .tx_o(tx),
     .jtag_tck(jtag_tck),
     .jtag_tms(jtag_tms),
     .jtag_tdi(jtag_tdi),

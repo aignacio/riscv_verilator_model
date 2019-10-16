@@ -22,14 +22,14 @@
  */
 void uart_set_cfg(int parity, uint16_t clk_counter) {
   unsigned int i;
-    //   CGREG |= (1 << CGUART); // don't clock gate UART
+//  CGREG |= (1 << CGUART); // don't clock gate UART
   *(volatile unsigned int*)(UART_REG_LCR) = 0x83; //sets 8N1 and set DLAB to 1
   *(volatile unsigned int*)(UART_REG_DLM) = (clk_counter >> 8) & 0xFF;
   *(volatile unsigned int*)(UART_REG_DLL) =  clk_counter       & 0xFF;
-  *(volatile unsigned int*)(UART_REG_FCR) = 0xA7; //enables 16byte FIFO and clear FIFOs
+  *(volatile unsigned int*)(UART_REG_FCR) = 0x27; //enables 16byte FIFO and clear FIFOs
   *(volatile unsigned int*)(UART_REG_LCR) = 0x03; //sets 8N1 and set DLAB to 0
 
-  *(volatile unsigned int*)(UART_REG_IER) = ((*(volatile unsigned int*)(UART_REG_IER)) & 0xF0) | 0x02; // set IER (interrupt enable register) on UART
+  *(volatile unsigned int*)(UART_REG_IER) = ((*(volatile unsigned int*)(UART_REG_IER)) & 0xF0) | 0x01; // set IER (interrupt enable register) on UART
 }
 
 void uart_send(const char* str, unsigned int len) {
@@ -41,12 +41,12 @@ void uart_send(const char* str, unsigned int len) {
     // wait until there is space in the fifo
     while( (*(volatile unsigned int*)(UART_REG_LSR) & 0x20) == 0);
 
-    for(i = 0; (i < UART_FIFO_DEPTH) && (len > 0); i++) {
+   // for(i = 0; (i < UART_FIFO_DEPTH) && (len > 0); i++) {
       // load FIFO
       *(volatile unsigned int*)(UART_REG_THR) = *str++;
 
       len--;
-    }
+    //}
   }
 }
 

@@ -599,14 +599,14 @@ module riscv_soc
     .PRDATA(apb_slaves[0].PRDATA),
     .PREADY(apb_slaves[0].PREADY),
     .PSLVERR(apb_slaves[0].PSLVERR),
-    .gpio_in({gpio_in,{12{1'b0}}}),
+    .gpio_in({gpio_in,{28{1'b0}}}),
     .gpio_in_sync(),
     .gpio_out(gpio_out),
     .gpio_dir(),
     .gpio_padcfg(),
     .interrupt(s_gpio_event)
   );
-
+`ifdef VERILATOR
   apb_uart_sv #(
     .APB_ADDR_WIDTH(`APB_ADDR_WIDTH)
   ) apb_uart (
@@ -624,6 +624,31 @@ module riscv_soc
     .tx_o(tx_o),
     .event_o(s_uart_event)
   );
+`else
+  apb_uart apb_uart_vhd (
+    .CLK(USE_SAME_CLOCK_CORE_PERIPH ? core_clk : periph_clk),
+    .RSTN(reset_n),
+    .PADDR(apb_ahb_bridge.PADDR[`APB_ADDR_WIDTH-1:2]),
+    .PWDATA(apb_ahb_bridge.PWDATA),
+    .PWRITE(apb_ahb_bridge.PWRITE),
+    .PSEL(apb_slaves[1].PSEL),
+    .PENABLE(apb_ahb_bridge.PENABLE),
+    .PRDATA(apb_slaves[1].PRDATA),
+    .PREADY(apb_slaves[1].PREADY),
+    .PSLVERR(apb_slaves[1].PSLVERR),
+    .INT      ( s_uart_event ),   //Interrupt output
+    .OUT1N    (),                    //Output 1
+    .OUT2N    (),                    //Output 2
+    .RTSN     ( uart_rts    ),       //RTS output
+    .DTRN     ( uart_dtr    ),       //DTR output
+    .CTSN     ( uart_cts    ),       //CTS input
+    .DSRN     ( uart_dsr    ),       //DSR input
+    .DCDN     ( 1'b1        ),       //DCD input
+    .RIN      ( 1'b1        ),       //RI input
+    .SIN      ( rx_i        ),
+    .SOUT     ( tx_o        )
+  );
+`endif
 
   apb_timer apb_timer (
     .HCLK(core_clk),

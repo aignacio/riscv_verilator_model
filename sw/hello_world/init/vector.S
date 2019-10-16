@@ -104,8 +104,8 @@ trap_vectors:
     j trap_machine_external_int
     j trap_machine_external_int
     j trap_machine_external_int
-    j trap_machine_external_int
-    j trap_machine_external_int
+    j uart_trap
+    j gpio_trap
     j trap_machine_external_int
     j machine_timer_trap
     j trap_machine_external_int
@@ -122,8 +122,15 @@ trap_machine_external_int:
     trap_entry
     jal isr_m_external
     trap_exit
-
 machine_timer_trap:
     trap_entry
     jal isr_m_timer
+    trap_exit
+uart_trap:
+    trap_entry
+    jal isr_uart
+    trap_exit
+gpio_trap:
+    trap_entry
+    jal isr_gpio
     trap_exit

@@ -210,6 +210,7 @@ int main(int argc, char** argv, char** env){
     else
         if (!loadELF(soc, argv[1], true)) exit(1);
 
+    soc->core->rx_i = 1;
     soc->reset_n(1);
     soc->core->fetch_enable_i = 1;
 

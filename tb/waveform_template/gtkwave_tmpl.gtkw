@@ -1,16 +1,16 @@
 [*]
 [*] GTKWave Analyzer v3.3.98 (w)1999-2019 BSI
-[*] Mon Oct 14 17:08:50 2019
+[*] Wed Oct 16 09:46:32 2019
 [*]
 [dumpfile] "/tmp/riscv_soc.vcd"
-[dumpfile_mtime] "Mon Oct 14 17:07:51 2019"
-[dumpfile_size] 278741299
+[dumpfile_mtime] "Wed Oct 16 09:46:06 2019"
+[dumpfile_size] 49534968
 [optimize_vcd]
 [savefile] "/home/aignacio/projects/riscv_verilator_model/tb/waveform_template/gtkwave_tmpl.gtkw"
-[timestart] 29
-[size] 1920 1080
-[pos] 0 0
-*0.000000 30 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[timestart] 1
+[size] 2560 1341
+[pos] 922 182
+*-10.769713 3986 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TOP.
 [treeopen] TOP.riscv_soc.
 [treeopen] TOP.riscv_soc.data_ram.ram_inst.
@@ -26,14 +26,18 @@
 [sst_width] 365
 [signals_width] 297
 [sst_expanded] 1
-[sst_vpaned_height] 500
+[sst_vpaned_height] 610
 @28
 TOP.periph_clk
 TOP.core_clk
 TOP.riscv_soc.dm_debug_req[0]
 TOP.riscv_soc.ndmreset_n
 TOP.riscv_soc.reset_n
+TOP.riscv_soc.rx_i
+TOP.riscv_soc.tx_o
 @22
+TOP.riscv_soc.gpio_out[11:0]
+TOP.riscv_soc.gpio_in[3:0]
 TOP.riscv_soc.riscv_cpu.boot_addr_i[31:0]
 TOP.riscv_soc.riscv_cpu.riscv_core_i.id_stage_i.pc_id_i[31:0]
 TOP.riscv_soc.riscv_cpu.riscv_core_i.id_stage_i.instr[31:0]
@@ -205,7 +209,57 @@ TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.csr_wdata_int[31:0]
 @22
 TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.mtvec_n[23:0]
 TOP.riscv_soc.riscv_cpu.riscv_core_i.cs_registers_i.mtvec_q[23:0]
-@23
 TOP.riscv_soc.riscv_cpu.riscv_core_i.if_stage_i.m_trap_base_addr_i[23:0]
+@23
+TOP.riscv_soc.apb_event_unit.irq_i[31:0]
+@c00022
+TOP.riscv_soc.apb_event_unit.irq_o[31:0]
+@28
+(0)TOP.riscv_soc.apb_event_unit.irq_o[31:0]
+(1)TOP.riscv_soc.apb_event_unit.irq_o[31:0]
+(2)TOP.riscv_soc.apb_event_unit.irq_o[31:0]
+(3)TOP.riscv_soc.apb_event_unit.irq_o[31:0]
+(4)TOP.riscv_soc.apb_event_unit.irq_o[31:0]
+(5)TOP.riscv_soc.apb_event_unit.irq_o[31:0]
+(6)TOP.riscv_soc.apb_event_unit.irq_o[31:0]
+(7)TOP.riscv_soc.apb_event_unit.irq_o[31:0]
+(8)TOP.riscv_soc.apb_event_unit.irq_o[31:0]
+(9)TOP.riscv_soc.apb_event_unit.irq_o[31:0]
+(10)TOP.riscv_soc.apb_event_unit.irq_o[31:0]
+(11)TOP.riscv_soc.apb_event_unit.irq_o[31:0]
+(12)TOP.riscv_soc.apb_event_unit.irq_o[31:0]
+(13)TOP.riscv_soc.apb_event_unit.irq_o[31:0]
+(14)TOP.riscv_soc.apb_event_unit.irq_o[31:0]
+(15)TOP.riscv_soc.apb_event_unit.irq_o[31:0]
+(16)TOP.riscv_soc.apb_event_unit.irq_o[31:0]
+(17)TOP.riscv_soc.apb_event_unit.irq_o[31:0]
+(18)TOP.riscv_soc.apb_event_unit.irq_o[31:0]
+(19)TOP.riscv_soc.apb_event_unit.irq_o[31:0]
+(20)TOP.riscv_soc.apb_event_unit.irq_o[31:0]
+(21)TOP.riscv_soc.apb_event_unit.irq_o[31:0]
+(22)TOP.riscv_soc.apb_event_unit.irq_o[31:0]
+(23)TOP.riscv_soc.apb_event_unit.irq_o[31:0]
+(24)TOP.riscv_soc.apb_event_unit.irq_o[31:0]
+(25)TOP.riscv_soc.apb_event_unit.irq_o[31:0]
+(26)TOP.riscv_soc.apb_event_unit.irq_o[31:0]
+(27)TOP.riscv_soc.apb_event_unit.irq_o[31:0]
+(28)TOP.riscv_soc.apb_event_unit.irq_o[31:0]
+(29)TOP.riscv_soc.apb_event_unit.irq_o[31:0]
+(30)TOP.riscv_soc.apb_event_unit.irq_o[31:0]
+(31)TOP.riscv_soc.apb_event_unit.irq_o[31:0]
+TOP.riscv_soc.apb_uart.event_o
+@1401200
+-group_end
+@800028
+TOP.riscv_soc.apb_uart.uart_interrupt_i.IER_i[2:0]
+@28
+(0)TOP.riscv_soc.apb_uart.uart_interrupt_i.IER_i[2:0]
+(1)TOP.riscv_soc.apb_uart.uart_interrupt_i.IER_i[2:0]
+(2)TOP.riscv_soc.apb_uart.uart_interrupt_i.IER_i[2:0]
+@1001200
+-group_end
+@28
+TOP.riscv_soc.apb_uart.uart_interrupt_i.trigger_level_reached
+TOP.riscv_soc.apb_uart.uart_interrupt_i.RDA_i
 [pattern_trace] 1
 [pattern_trace] 0

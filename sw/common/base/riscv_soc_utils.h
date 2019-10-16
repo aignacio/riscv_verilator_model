@@ -14,4 +14,12 @@
 #define EVENT_UNIT_BASE_ADDR    (APB_BUS_ADDR+0x30000)
 #define SOC_CTRL_BASE_ADDR      (APB_BUS_ADDR+0x40000)
 
+// ISRS wire signals
+#define UART_EVENT              1 << 23
+#define GPIO_EVENT              1 << 24
+#define TIMER_A_OVERFLOW        1 << 25
+#define TIMER_A_OUTPUT_CMP      1 << 26
+#define TIMER_B_OVERFLOW        1 << 27
+#define TIMER_B_OUTPUT_CMP      1 << 28
+
 #endif

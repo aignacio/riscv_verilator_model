@@ -11,7 +11,7 @@
 module io_generic_fifo
 #(
     parameter DATA_WIDTH = 32,
-    parameter BUFFER_DEPTH = 2,
+    parameter BUFFER_DEPTH = 16,
     parameter LOG_BUFFER_DEPTH = $clog2(BUFFER_DEPTH)
 )
 (
@@ -76,8 +76,22 @@ module io_generic_fifo
         if (rstn_i == 1'b0)
         begin
           // for (loop1 = 0 ; loop1 < BUFFER_DEPTH ; loop1 = loop1 + 1)
-            buffer[0] <= 32'h0;
-            buffer[1] <= 32'h0;
+            buffer[0] <=  'h0;
+            buffer[1] <=  'h0;
+            buffer[2] <=  'h0;
+            buffer[3] <=  'h0;
+            buffer[4] <=  'h0;
+            buffer[5] <=  'h0;
+            buffer[6] <=  'h0;
+            buffer[7] <=  'h0;
+            buffer[8] <=  'h0;
+            buffer[9] <=  'h0;
+            buffer[10] <= 'h0;
+            buffer[11] <= 'h0;
+            buffer[12] <= 'h0;
+            buffer[13] <= 'h0;
+            buffer[14] <= 'h0;
+            buffer[15] <= 'h0;
         end
         else
         begin

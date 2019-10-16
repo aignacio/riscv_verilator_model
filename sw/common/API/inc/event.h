@@ -76,15 +76,6 @@
 // sleep status register
 #define SSR __PE__(REG_SLEEP_STATUS)
 
-
-// ISRS wire signals
-#define UART_EVENT              23
-#define GPIO_EVENT              24
-#define TIMER_A_OVERFLOW        25
-#define TIMER_A_OUTPUT_CMP      26
-#define TIMER_B_OVERFLOW        27
-#define TIMER_B_OUTPUT_CMP      28
-
 void cfg_int(bool int_en);
 void int_periph_enable(unsigned int periph_mask);
 void int_periph_disable(unsigned int periph_mask);

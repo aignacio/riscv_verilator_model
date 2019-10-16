@@ -21,7 +21,7 @@ size_t _write(int fildes, const void *buf, size_t nbyte) {
         *printf_buffer = cbuf[i];
     #else
         #warning "[PLEASE READ] PRINTF output will be redirected to UART peripheral"
-        uart_send((const char *)&cbuf[i],1);
+        uart_sendchar((char)cbuf[i]);
     #endif
     }
     return nbyte;
@@ -43,15 +43,53 @@ void loop_leds(){
     }
 }
 
+void isr_gpio(void) {
+    int_periph_clear(GPIO_EVENT);
+    printf("\n\rGPIO ISR!");
+    return;
+    while(1);
+}
+
+void isr_uart(void) {
+    int_periph_clear(UART_EVENT);
+    printf("\n\rUART ISR received = %c",*(volatile int*) UART_REG_RBR);
+    return;
+}
+
 void isr_m_timer(void) {
     // write_csr(mip, (0 << IRQ_M_EXT));
     printf("\n\rHello World - trap Timer!");
-    int_periph_clear(1 << TIMER_A_OUTPUT_CMP);
-    set_cmp(20000000);
+    int_periph_clear(TIMER_A_OUTPUT_CMP);
+
+    #if VERILATOR == 0
+    set_cmp(10000000);
     loop_leds();
+    #else
+    set_cmp(10000);
+    #endif
 
     return;
     while(1);
+}
+
+void setup_irqs(){
+    int_periph_clear(UART_EVENT);
+    int_periph_clear(TIMER_A_OUTPUT_CMP);
+
+    set_gpio_pin_irq_en(12, true);
+    set_gpio_pin_irq_type(12, GPIO_IRQ_RISE);
+
+    #if VERILATOR == 0
+    set_cmp(10000000);
+    #else
+    set_cmp(10000);
+    #endif
+    int_periph_enable(GPIO_EVENT);
+    int_periph_enable(TIMER_A_OUTPUT_CMP);
+    #if VERILATOR == 0
+        int_periph_enable(UART_EVENT);
+    #endif
+    cfg_int(true);
 }
 
 int main(void) {
@@ -64,28 +102,16 @@ int main(void) {
     for (int i = 0;i<12;i+=1)
         set_gpio_pin_value(i,false);
 
-    // To calculate uart speed clk_clounter,
+    // To calculate uart speed,
     // consider the following:
-    // clk_counter = periph_clk / baud_rate
-    // clk_counter = 80 = 250k
-    // clk_counter = 174 ~115200
-    uart_set_cfg(0, 130);
-
-    cfg_int(true);
-    int_periph_clear(1 << TIMER_A_OUTPUT_CMP);
-    int_periph_enable(1 << TIMER_A_OUTPUT_CMP);
-    set_cmp(20000000);
-
+    // baud_rate = periph_clk / 2^(parameter)
+    // uart_set_cfg(0, 7);
+    // 7 => 117187 ~> 115200
+    uart_set_cfg(0, 7);
+    setup_irqs();
     start_timer();
 
     while(1){
-        #if VERILATOR == 1
-            printf("\nHello World = %d", get_time());
-        #else
-            // printf("\n\rHello... %d",get_time());
-            // int mtvec = read_csr(mtvec);
-            // int mtimer = get_time();
-            // printf("\n\rMTIMER = %x", mtimer);
-        #endif
+        printf("\n\rHello... %d",get_time());
     };
 }

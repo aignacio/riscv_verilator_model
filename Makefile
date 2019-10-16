@@ -71,6 +71,7 @@ SOC_IPS				:=	ahb3lite_pkg									\
 									apb_gpio 											\
 									memory 												\
 									apb4_mux 											\
+									apb_uart											\
 									apb_uart_sv/apb_uart.sv				\
 									apb_uart_sv/uart_interrupt.sv	\
 									apb_uart_sv/uart_rx.sv				\
@@ -150,6 +151,7 @@ SRC_RI5CY_DBG	:= 	ips/riscv-dbg/src/dm_pkg.sv										\
 
 # All sources needed to build the verilator model and FPGA
 BOOT_ROM			:=	sw/boot_rom/output/prog_rom.sv
+SRC_VHDL			:=	$(foreach IP,$(SOC_IPS),$(shell find $(IPS_FOLDER)/$(IP) -type f -name *.vhd))
 SRC_VERILOG 	:=	$(foreach IP,$(SOC_IPS),$(shell find $(IPS_FOLDER)/$(IP) -type f -name *.v))
 SRC_VERILOG 	+=	$(foreach IP,$(SOC_IPS),$(shell find $(IPS_FOLDER)/$(IP) -type f -name *.sv))
 SRC_VERILOG		+=	$(SRC_RI5CY_DBG)
@@ -219,6 +221,7 @@ VERIL_ARGS		:=	-CFLAGS $(CPPFLAGS_VERI) 			\
 									-o 														\
 									$(ROOT_MOD_VERI)
 
+export SRC_VHDL
 export SRC_VERILOG
 export INC_VERILOG
 export MACRO_VLOG
@@ -308,7 +311,6 @@ clean:
 	$(info Cleaning verilator simulation files...)
 	$(info rm -rf $(OUT_VERILATOR))
 	@rm -rf $(OUT_VERILATOR)
-	+@make -C sw/$(TEST_PROG) clean
 
 ####################### check for dependencies #######################
 .PHONY: setup check install docker rundocker
