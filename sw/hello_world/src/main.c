@@ -10,6 +10,7 @@
 #include "encoding.h"
 #include "timer.h"
 
+extern uint32_t  _start;
 extern uint32_t  _start_vector;
 volatile uint32_t* const printf_buffer = (uint32_t*) PRINTF_VERILATOR;
 
@@ -46,30 +47,21 @@ void loop_leds(){
 void isr_gpio(void) {
     int_periph_clear(GPIO_EVENT);
     printf("\n\rGPIO ISR!");
-    return;
-    while(1);
 }
 
 void isr_uart(void) {
     int_periph_clear(UART_EVENT);
-    printf("\n\rUART ISR received = %c",*(volatile int*) UART_REG_RBR);
-    return;
+    uint8_t uart_rx = *(volatile int*) UART_REG_RBR;
+    printf("\n\rUART ISR received = %c",uart_rx);
+    uart_rx = *(volatile int*) UART_REG_RBR;
 }
 
 void isr_m_timer(void) {
-    // write_csr(mip, (0 << IRQ_M_EXT));
-    printf("\n\rHello World - trap Timer!");
     int_periph_clear(TIMER_A_OUTPUT_CMP);
-
+    printf("\n\rTimer ISR!");
     #if VERILATOR == 0
-    set_cmp(10000000);
-    loop_leds();
-    #else
-    set_cmp(10000);
+        loop_leds();
     #endif
-
-    return;
-    while(1);
 }
 
 void setup_irqs(){
@@ -102,16 +94,22 @@ int main(void) {
     for (int i = 0;i<12;i+=1)
         set_gpio_pin_value(i,false);
 
+    // Set the reset address to the entry point
+    volatile uint32_t *address_rst = (uint32_t *)RST_CTRL_BASE_ADDR;
+
+    *(address_rst) = (uint32_t )&_start;
+
     // To calculate uart speed,
     // consider the following:
     // baud_rate = periph_clk / 2^(parameter)
     // uart_set_cfg(0, 7);
     // 7 => 117187 ~> 115200
     uart_set_cfg(0, 7);
+
     setup_irqs();
     start_timer();
 
     while(1){
-        printf("\n\rHello... %d",get_time());
-    };
+        // printf("\n\rOla mundo!");
+    }
 }

@@ -172,7 +172,7 @@ bool loadELF(testbench<Vriscv_soc> *cpu, const char *program_path, const bool en
 
     if(en_print) printf("\nEntry point: %8x", (uint32_t) entry_point);
 
-    cpu->core->boot_addr_i = (uint32_t) entry_point;
+    cpu->core->riscv_soc->writeRstAddr((uint32_t) entry_point);
     cpu->loaded = true;
     cout << endl << endl;
     return true;
@@ -203,15 +203,16 @@ int main(int argc, char** argv, char** env){
     cout << "\n[IRAM KB Size] " << STRINGIZE_VALUE_OF(IRAM_KB_SIZE) << "KB";
     cout << "\n[DRAM KB Size] " << STRINGIZE_VALUE_OF(DRAM_KB_SIZE) << "KB \n";
 
+    soc->core->rx_i = 1;
+    soc->reset_n(1);
+
     if (JTAG_BOOT){
         rbb->accept_client();
-        soc->core->boot_addr_i = 0x1A000000;
+        soc->core->riscv_soc->writeRstAddr(0x1A000000);
     }
     else
         if (!loadELF(soc, argv[1], true)) exit(1);
 
-    soc->core->rx_i = 1;
-    soc->reset_n(1);
     soc->core->fetch_enable_i = 1;
 
     struct sigaction sigIntHandler;

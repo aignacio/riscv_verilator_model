@@ -10,4 +10,4 @@
 |       UART      |  0x4001_0000  | 0x4001_FFFF | 64KB |  1 (APB) |
 |      Timer      |  0x4002_0000  | 0x4002_FFFF | 64KB |  2 (APB) |
 | Int. Controller |  0x4003_0000  | 0x4003_FFFF | 64KB |  3 (APB) |
-
+|    Reset Ctrl   |  0x4004_0000  | 0x4004_FFFF | 64KB |  4 (APB) |

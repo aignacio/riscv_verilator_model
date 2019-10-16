@@ -10,23 +10,21 @@
 
 #include <gpio.h>
 
-void set_pin_function(int pinnumber, int function) {
-  volatile int old_function;
-  int addr;
+// void set_pin_function(int pinnumber, int function) {
+//   volatile int old_function;
+//   int addr;
+//   old_function = *(volatile int*) (SOC_CTRL_PADFUN);
+//   old_function = old_function & (~(1 << pinnumber));
+//   old_function = old_function | (function << pinnumber);
+//   *(volatile int*) (SOC_CTRL_PADFUN) = old_function;
+// }
 
-
-  old_function = *(volatile int*) (SOC_CTRL_PADFUN);
-  old_function = old_function & (~(1 << pinnumber));
-  old_function = old_function | (function << pinnumber);
-  *(volatile int*) (SOC_CTRL_PADFUN) = old_function;
-}
-
-int  get_pin_function(int pinnumber) {
-  volatile int old_function;
-  old_function = *(volatile int*) (SOC_CTRL_PADFUN);
-  old_function = (old_function >> pinnumber & 0x01);
-  return old_function;
-}
+// int  get_pin_function(int pinnumber) {
+//   volatile int old_function;
+//   old_function = *(volatile int*) (SOC_CTRL_PADFUN);
+//   old_function = (old_function >> pinnumber & 0x01);
+//   return old_function;
+// }
 
 void set_gpio_pin_direction(int pinnumber, int direction) {
   volatile int old_dir;

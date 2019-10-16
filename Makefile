@@ -262,6 +262,9 @@ all: verilator
 fpga: $(SRC_VERILOG) $(BOOT_ROM)
 	+@make -C fpga force
 
+error:
+	cat fpga/main/output/console.log | grep --color "ERROR:"
+
 sw/boot_rom/%.sv:
 	+@make -C sw/boot_rom all
 

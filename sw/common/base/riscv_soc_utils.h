@@ -12,7 +12,7 @@
 #define UART_BASE_ADDR          (APB_BUS_ADDR+0x10000)
 #define TIMER_BASE_ADDR         (APB_BUS_ADDR+0x20000)
 #define EVENT_UNIT_BASE_ADDR    (APB_BUS_ADDR+0x30000)
-#define SOC_CTRL_BASE_ADDR      (APB_BUS_ADDR+0x40000)
+#define RST_CTRL_BASE_ADDR      (APB_BUS_ADDR+0x40000)
 
 // ISRS wire signals
 #define UART_EVENT              1 << 23

@@ -38,7 +38,7 @@
 #define GPIO_REG_PADCFG6              ( GPIO_BASE_ADDR + 0x38 )
 #define GPIO_REG_PADCFG7              ( GPIO_BASE_ADDR + 0x3C )
 
-#define SOC_CTRL_PADFUN               ( SOC_CTRL_BASE_ADDR + 0x00 )
+// #define SOC_CTRL_PADFUN               ( SOC_CTRL_BASE_ADDR + 0x00 )
 
 
 
@@ -59,7 +59,7 @@
 #define PADCFG6 			REGP(GPIO_REG_PADCFG6)
 #define PADCFG7 			REGP(GPIO_REG_PADCFG7)
 
-#define PADFUN 				REGP(SOC_CTRL_PADFUN)
+// #define PADFUN 				REGP(SOC_CTRL_PADFUN)
 
 
 #define FUNC_GPIO 1
@@ -72,8 +72,8 @@
 #define GPIO_IRQ_LEV0  0x0
 #define GPIO_IRQ_LEV1  0x1
 
-void set_pin_function(int pinnumber, int function);
-int  get_pin_function(int pinnumber);
+// void set_pin_function(int pinnumber, int function);
+// int  get_pin_function(int pinnumber);
 
 void set_gpio_pin_direction(int pinnumber, int direction);
 int  get_gpio_pin_direction(int pinnumber);
