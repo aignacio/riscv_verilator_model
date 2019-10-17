@@ -29,7 +29,7 @@ module artix_wrapper (
   assign clk_locked = locked;
   assign tx_o = tx;
   assign tx_mirror_o = tx;
-  assign rx = rx_i | rx_mirror_i;
+  assign rx = rx_i;
 
   mmcm clk_mmcm (
     // Clock in ports

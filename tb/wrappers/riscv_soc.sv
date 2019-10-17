@@ -644,8 +644,8 @@ module riscv_soc
     .DTRN     ( uart_dtr    ),       //DTR output
     .CTSN     ( uart_cts    ),       //CTS input
     .DSRN     ( uart_dsr    ),       //DSR input
-    .DCDN     ( 1'b1        ),       //DCD input
-    .RIN      ( 1'b1        ),       //RI input
+    .DCDN     ( 1           ),       //DCD input
+    .RIN      ( 1           ),       //RI input
     .SIN      ( rx_i        ),
     .SOUT     ( tx_o        )
   );

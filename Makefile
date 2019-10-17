@@ -1,8 +1,6 @@
 # SHELL := /bin/bash
 RISCV_TOOLCHAIN ?=	riscv-none-embed
 export RISCV_TOOLCHAIN
-SSH_KEY				:=	$$(cat ~/.ssh/id_rsa)
-SSH_KEY_PUB		:=	$$(cat ~/.ssh/id_rsa.pub)
 ##### Project variables
 PROJECT_NAME	:=	riscv
 VERILATOR_TB	:=	tb
@@ -14,11 +12,12 @@ DRAM_KB_SIZE	?=	32
 JTAG_BOOT			?=	0
 JTAG_PORT			?=	8080
 MAX_THREAD		?=	$(shell nproc --all)
+VERILAT				?=	1
 ##### FPGA makefile variables
 FPGA_BOARD		?=	artix_a35
-CPU_CORES			:=	8
-FPGA_WRAPPER	:=	artix_wrapper
-SYNTH_MODE		:=	none
+CPU_CORES			?=	8
+FPGA_WRAPPER	?=	artix_wrapper
+SYNTH_MODE		?=	none
 
 ifeq ($(FPGA_BOARD),artix_a35)
 	XILINX_BOARD	:=	digilentinc.com:arty-a7-35:part0:1.0
@@ -56,7 +55,7 @@ endif
 
 ##### Verilator Specific Simulation variables
 OUT_VERILATOR	:=	output_verilator
-TEST_PROG			:=	hello_world
+TEST_PROG			?=	hello_world
 TB_VERILATOR	:=	$(VERILATOR_TB)/cpp/testbench.cpp
 
 DEPEND	   		:=	git				\
@@ -302,13 +301,13 @@ $(OUT_VERILATOR)/V$(ROOT_MOD_VERI).mk: $(SRC_VERILOG) $(SRC_CPP) $(TB_VERILATOR)
 	verilator $(VERIL_ARGS)
 
 sw:
-	+@make -C sw/$(TEST_PROG) VERILAT=1 all
+	+@make -C sw/$(TEST_PROG) VERILAT=$(VERILAT) all
 
 openocd:
 	riscv-openocd -f tb/debug/riscv_pulp.cfg
 
 gdb: sw
-	$(RISCV_TOOLCHAIN)-gdb sw/$(TEST_PROG)/output/$(TEST_PROG).elf -ex "target remote : 3333" -ex "load"
+	$(RISCV_TOOLCHAIN)-gdb sw/$(TEST_PROG)/output/$(TEST_PROG).elf -ex "target remote : 3333" -ex "load" -ex "c"
 
 clean:
 	$(info Cleaning verilator simulation files...)
@@ -316,10 +315,7 @@ clean:
 	@rm -rf $(OUT_VERILATOR)
 
 ####################### check for dependencies #######################
-.PHONY: setup check install docker rundocker
-setup: check
-	$(call print_logo)
-
+.PHONY: check install docker rundocker
 check:
 	$(foreach program,$(DEPEND),$(call check_program,$(program)))
 
@@ -327,7 +323,7 @@ install:
 	$(foreach program,$(DEPEND),$(call install_program,$(program)))
 
 docker:
-	docker build -t riscv_model --build-arg ssh_prv_key="$(SSH_KEY)" --build-arg ssh_pub_key="$(SSH_KEY_PUB)" dockerfile
+	docker build -t riscv_model dockerfile
 
 rundocker:
 	docker run --rm -it -p 8080:8080 riscv_model:latest

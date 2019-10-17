@@ -53,7 +53,6 @@ void isr_uart(void) {
     int_periph_clear(UART_EVENT);
     uint8_t uart_rx = *(volatile int*) UART_REG_RBR;
     printf("\n\rUART ISR received = %c",uart_rx);
-    uart_rx = *(volatile int*) UART_REG_RBR;
 }
 
 void isr_m_timer(void) {
@@ -67,17 +66,23 @@ void isr_m_timer(void) {
 void setup_irqs(){
     int_periph_clear(UART_EVENT);
     int_periph_clear(TIMER_A_OUTPUT_CMP);
+    int_periph_clear(GPIO_EVENT);
 
-    set_gpio_pin_irq_en(12, true);
-    set_gpio_pin_irq_type(12, GPIO_IRQ_RISE);
+    for (int i = 28;i<32;i++)
+        set_gpio_pin_irq_en(i, true);
+
+    for (int i = 28;i<32;i++)
+        set_gpio_pin_irq_type(i, GPIO_IRQ_RISE);
 
     #if VERILATOR == 0
-    set_cmp(10000000);
+    set_cmp(20000000);
     #else
     set_cmp(10000);
     #endif
+
     int_periph_enable(GPIO_EVENT);
     int_periph_enable(TIMER_A_OUTPUT_CMP);
+    int_periph_enable(UART_EVENT);
     #if VERILATOR == 0
         int_periph_enable(UART_EVENT);
     #endif
@@ -89,7 +94,7 @@ int main(void) {
 
     for (int i = 0;i<11;i++)
         set_gpio_pin_direction(i,DIR_OUT);
-    for (int i = 12;i<16;i++)
+    for (int i = 28;i<32;i++)
         set_gpio_pin_direction(i,DIR_IN);
     for (int i = 0;i<12;i+=1)
         set_gpio_pin_value(i,false);
@@ -109,7 +114,5 @@ int main(void) {
     setup_irqs();
     start_timer();
 
-    while(1){
-        // printf("\n\rOla mundo!");
-    }
+    while(1);
 }
