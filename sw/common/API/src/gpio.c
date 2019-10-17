@@ -7,7 +7,6 @@
 // this License is distributed on an “AS IS” BASIS, WITHOUT WARRANTIES OR
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
-
 #include <gpio.h>
 
 // void set_pin_function(int pinnumber, int function) {
@@ -94,4 +93,13 @@ void set_gpio_pin_irq_type(int pinnumber, int type) {
 
 int get_gpio_irq_status() {
   return *(volatile int*) (GPIO_REG_INTSTATUS);
+}
+
+void enable_gpio_pins_read(int pins){
+    *(volatile int*) (GPIO_REG_ENPIN) = pins;
+}
+
+int read_enabled_irqs(){
+    int value = *(volatile int*) (GPIO_REG_INTEN);
+    return value;
 }

@@ -28,6 +28,7 @@
 #define GPIO_REG_INTTYPE0             ( GPIO_BASE_ADDR + 0x10 )
 #define GPIO_REG_INTTYPE1             ( GPIO_BASE_ADDR + 0x14 )
 #define GPIO_REG_INTSTATUS            ( GPIO_BASE_ADDR + 0x18 )
+#define GPIO_REG_ENPIN                ( GPIO_BASE_ADDR + 0x1C )
 
 #define GPIO_REG_PADCFG0              ( GPIO_BASE_ADDR + 0x20 )
 #define GPIO_REG_PADCFG1              ( GPIO_BASE_ADDR + 0x24 )
@@ -39,8 +40,6 @@
 #define GPIO_REG_PADCFG7              ( GPIO_BASE_ADDR + 0x3C )
 
 // #define SOC_CTRL_PADFUN               ( SOC_CTRL_BASE_ADDR + 0x00 )
-
-
 
 #define PADDIR 				REGP(GPIO_REG_PADDIR)
 #define PADIN 				REGP(GPIO_REG_PADIN)
@@ -74,6 +73,8 @@
 
 // void set_pin_function(int pinnumber, int function);
 // int  get_pin_function(int pinnumber);
+void enable_gpio_pins_read(int pins);
+int read_enabled_irqs();
 
 void set_gpio_pin_direction(int pinnumber, int direction);
 int  get_gpio_pin_direction(int pinnumber);
