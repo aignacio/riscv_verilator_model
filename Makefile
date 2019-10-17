@@ -9,8 +9,8 @@ VERILATOR_TB	:=	tb
 IPS_FOLDER		:=	ips
 EN_VCD				?=	0
 # Define here the size of the RAMs once it need to check if the program fits
-IRAM_KB_SIZE	:=	32
-DRAM_KB_SIZE	:=	32
+IRAM_KB_SIZE	?=	32
+DRAM_KB_SIZE	?=	32
 JTAG_BOOT			?=	0
 JTAG_PORT			?=	8080
 MAX_THREAD		?=	$(shell nproc --all)
@@ -178,7 +178,7 @@ VERILATOR_EXE	:=	$(OUT_VERILATOR)/$(ROOT_MOD_VERI)
 SRC_CPP				:=	$(wildcard $(VERILATOR_TB)/cpp/*.cpp)
 INC_CPP				:=	../tb/cpp/elfio
 INCS_CPP			:=	$(addprefix -I,$(INC_CPP))
-WAVEFORM_VCD	:=	/tmp/$(ROOT_MOD_VERI).vcd #$(OUT_VERILATOR)/$(ROOT_MOD_VERI).vcd
+WAVEFORM_VCD	?=	/tmp/$(ROOT_MOD_VERI).vcd #$(OUT_VERILATOR)/$(ROOT_MOD_VERI).vcd
 WAVEFORM_VERI	:=	$(VERILATOR_TB)/waveform_template/gtkwave_tmpl.gtkw
 VERIL_FLAGS		:=	-O3 										\
 									-Wno-CASEINCOMPLETE 		\
@@ -292,7 +292,7 @@ run: sw $(VERILATOR_EXE)
 verilator: $(VERILATOR_EXE)
 	@echo "\n"
 	@echo "Emulator builded, for usage please follow:"
-	@echo "\033[96m\e[1m./$(VERILATOR_EXE) -h\033[0m"
+	@echo "\033[96m\e[1m./$(VERILATOR_EXE) myprogram.elf\033[0m"
 	@echo "\n"
 
 $(VERILATOR_EXE): $(OUT_VERILATOR)/V$(ROOT_MOD_VERI).mk
